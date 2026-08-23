@@ -139,8 +139,10 @@
   }
   details.group{
     background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;
+    transition:box-shadow .15s ease, border-color .15s ease;
   }
-  details.group[open]{box-shadow:0 2px 8px rgba(0,0,0,.06);}
+  details.group:hover{box-shadow:0 2px 10px rgba(0,0,0,.08);}
+  details.group[open]{box-shadow:0 4px 16px rgba(0,0,0,.10);border-color:var(--lely-red);}
   details.group summary{
     cursor:pointer;padding:12px 14px;font-weight:700;font-size:.92rem;background:var(--surface2);color:var(--ink);
     list-style:none; display:flex; justify-content:space-between; align-items:center; gap:8px;
@@ -162,6 +164,7 @@
   }
   .item-thumb img{width:100%;height:100%;object-fit:cover;}
   .item-thumb.empty{color:var(--muted);font-size:.65rem;text-align:center;}
+  .item-thumb.empty svg{width:20px;height:20px;opacity:.55;}
   .item-thumb .preview{
     display:none;position:absolute;left:48px;top:-10px;width:220px;height:220px;border:2px solid var(--lely-red);
     border-radius:8px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:60;overflow:hidden;
@@ -205,8 +208,19 @@
     box-shadow:0 -2px 10px rgba(0,0,0,.08); padding:12px 18px; z-index:60;
   }
   .bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:relative;}
-  .cart-count{font-size:.85rem;font-weight:700;color:var(--lely-red-dark);background:none;border:none;padding:8px 10px;cursor:pointer;border-radius:7px;font-family:inherit;}
-  .cart-count:hover{background:rgba(200,16,46,.08);}
+  .cart-count{
+    display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:700;color:var(--ink);
+    background:var(--card);border:1.5px solid var(--border);padding:8px 14px 8px 10px;cursor:pointer;
+    border-radius:20px;font-family:inherit;transition:all .12s ease;
+  }
+  .cart-count:hover{border-color:var(--lely-red);}
+  .cart-count.has-items{border-color:var(--lely-red);color:var(--lely-red-dark);background:rgba(200,16,46,.05);}
+  .cart-icon{position:relative;font-size:1.15rem;line-height:1;}
+  .cart-badge{
+    position:absolute;top:-8px;right:-11px;min-width:16px;height:16px;padding:0 4px;
+    background:var(--lely-red);color:#fff;border-radius:20px;font-size:.62rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;line-height:1;
+  }
   .cart-preview{
     display:none;position:absolute;bottom:100%;left:0;margin-bottom:10px;
     background:var(--card);border:1px solid var(--border);border-radius:10px;
@@ -315,7 +329,10 @@
 
 <footer class="bar">
   <div class="bar-inner">
-    <button type="button" class="cart-count" id="cart-count">0 Artikel ausgewählt</button>
+    <button type="button" class="cart-count" id="cart-count">
+      <span class="cart-icon">🛒<span class="cart-badge" id="cart-badge">0</span></span>
+      <span id="cart-label">Warenkorb leer</span>
+    </button>
     <div class="cart-preview" id="cart-preview"></div>
     <div class="bar-spacer"></div>
     <button class="secondary" id="btn-reset">Zurücksetzen</button>
@@ -597,7 +614,7 @@ Object.keys(categories).forEach(catName=>{
           openLightbox(IMAGES[it.img], it.bezeichnung);
         });
       } else {
-        thumb.textContent = 'kein Bild';
+        thumb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 L12 4 L20 8"/><rect x="4" y="8" width="16" height="12" rx="1"/><line x1="12" y1="8" x2="12" y2="20"/></svg>';
       }
 
       const mainCol = document.createElement('div');
@@ -693,9 +710,11 @@ function onQtyChange(e){
 
 function updateCartCount(){
   const chosen = ITEMS.filter(it => parseFloat(it._qtyInput.value) > 0);
-  document.getElementById('cart-count').textContent = chosen.length === 0
-    ? '0 Artikel ausgewählt'
+  document.getElementById('cart-badge').textContent = chosen.length;
+  document.getElementById('cart-label').textContent = chosen.length === 0
+    ? 'Warenkorb leer'
     : chosen.length + ' Artikel ausgewählt';
+  document.getElementById('cart-count').classList.toggle('has-items', chosen.length > 0);
   renderCartPreview(chosen);
 }
 

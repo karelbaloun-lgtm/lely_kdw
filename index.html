@@ -761,6 +761,38 @@ Object.keys(categories).forEach(catName=>{
   main.appendChild(catDiv);
 });
 
+// ---- draft auto-save/restore: don't lose an unsent order on accidental close ----
+const DRAFT_KEY = 'kdw_draft_order';
+function saveDraft(){
+  const draft = {};
+  ITEMS.forEach(it => {
+    const v = parseFloat(it._qtyInput.value);
+    if (v > 0) draft[it.artikel] = it._qtyInput.value;
+  });
+  try {
+    if (Object.keys(draft).length > 0) localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    else localStorage.removeItem(DRAFT_KEY);
+  } catch(e){}
+}
+function clearDraft(){
+  try { localStorage.removeItem(DRAFT_KEY); } catch(e){}
+}
+function restoreDraft(){
+  let draft = null;
+  try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch(e){}
+  if (!draft) return;
+  ITEMS.forEach(it => {
+    if (draft[it.artikel] != null){
+      it._qtyInput.value = draft[it.artikel];
+      const v = parseFloat(draft[it.artikel]);
+      it._qtyInput.classList.toggle('filled', v > 0);
+      it._rowEl.classList.toggle('zero-qty', !(v > 0));
+    }
+  });
+  updateCartCount();
+}
+restoreDraft();
+
 // ---- category tabs ----
 const tabsWrap = document.getElementById('category-tabs');
 const catDivs = [...document.querySelectorAll('.category')];
@@ -807,6 +839,7 @@ function onQtyChange(e){
   const row = e.target.closest('.item-row');
   row.classList.toggle('zero-qty', !(v>0));
   updateCartCount();
+  saveDraft();
 }
 
 function updateCartCount(){
@@ -862,6 +895,7 @@ document.getElementById('btn-reset').addEventListener('click', ()=>{
     it._rowEl.classList.add('zero-qty');
   });
   updateCartCount();
+  clearDraft();
 });
 
 // ---- search filter ----
@@ -928,6 +962,7 @@ function sendOrder(deliverTo){
   });
   const subject = `Bestellung Einbaumaterial - ${p.name} - ${datum}`;
   const mailto = `mailto:${TARGET_EMAIL}?cc=${encodeURIComponent(CC_EMAIL)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  clearDraft();
   window.location.href = mailto;
 }
 

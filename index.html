@@ -935,6 +935,31 @@ document.getElementById('search').addEventListener('input', e=>{
 // ---- submit via email (with delivery address choice) ----
 const deliveryModal = document.getElementById('delivery-modal');
 
+// If the item is sold by the metre (lfm.) and its info note names a
+// bundle/roll size (e.g. "1 Bund = 100m" or "10m-Rolle"), and the
+// entered quantity is an exact multiple of it, append "(N Bund)" etc.
+function formatQtyWithBundle(it, qtyStr){
+  const plain = `${qtyStr} ${it.einheit}`;
+  if (!/lfm/i.test(it.einheit || '')) return plain;
+  const info = it.info || '';
+  let word, size;
+  let m = info.match(/(Bund|Rolle)\s*[:=]?\s*(\d+(?:[.,]\d+)?)\s*m\b/i);
+  if (m) { word = m[1]; size = m[2]; }
+  else {
+    m = info.match(/(\d+(?:[.,]\d+)?)\s*m[\s-]*(Bund|Rolle)\b/i);
+    if (m) { size = m[1]; word = m[2]; }
+  }
+  if (!word) return plain;
+  const sizeNum = parseFloat(String(size).replace(',', '.'));
+  const qtyNum = parseFloat(String(qtyStr).replace(',', '.'));
+  if (!sizeNum || !qtyNum) return plain;
+  const n = qtyNum / sizeNum;
+  if (Math.abs(n - Math.round(n)) < 0.001 && Math.round(n) >= 1){
+    return `${plain} (${Math.round(n)} ${word})`;
+  }
+  return plain;
+}
+
 function sendOrder(deliverTo){
   const chosen = ITEMS.filter(it => parseFloat(it._qtyInput.value) > 0);
   const p = PEOPLE[sel.value];
@@ -957,7 +982,7 @@ function sendOrder(deliverTo){
     if (i > 0) body += `------------------------------------------\n`;
     body += `\n${kat.toUpperCase()}:\n`;
     chosenByKat[kat].forEach(it=>{
-      body += `- ${it.artikel || ''}  |  ${it.bezeichnung}  |  ${it._qtyInput.value} ${it.einheit}\n`;
+      body += `- ${it.artikel || ''}  |  ${it.bezeichnung}  |  ${formatQtyWithBundle(it, it._qtyInput.value)}\n`;
     });
   });
   const subject = `Bestellung Einbaumaterial - ${p.name} - ${datum}`;

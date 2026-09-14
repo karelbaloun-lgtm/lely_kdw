@@ -694,6 +694,9 @@ Object.keys(categories).forEach(catName=>{
     summary.appendChild(rightWrap);
     det.appendChild(summary);
 
+    const groupBody = document.createElement('div');
+    groupBody.className = 'group-body';
+
     groupItems.forEach(it=>{
       const row = document.createElement('div');
       row.className = 'item-row zero-qty';
@@ -754,7 +757,7 @@ Object.keys(categories).forEach(catName=>{
       row.appendChild(mainCol);
       row.appendChild(unitDiv);
       row.appendChild(qtyWrap);
-      det.appendChild(row);
+      groupBody.appendChild(row);
 
       it._rowIndex = rowIndex;
       it._qtyInput = qtyInput;
@@ -762,6 +765,7 @@ Object.keys(categories).forEach(catName=>{
       rowIndex++;
     });
 
+    det.appendChild(groupBody);
     catDiv.appendChild(det);
   });
 
@@ -799,6 +803,57 @@ function restoreDraft(){
   updateCartCount();
 }
 restoreDraft();
+
+// ---- animated group expand/collapse (native <details> has no transition) ----
+document.querySelectorAll('details.group').forEach(det=>{
+  const summary = det.querySelector('summary');
+  const body = det.querySelector('.group-body');
+  let animating = false;
+
+  function finish(closing){
+    if (closing) det.open = false;
+    body.style.transition = '';
+    body.style.maxHeight = '';
+    body.style.overflow = '';
+    animating = false;
+  }
+
+  function animateTo(targetH, closing){
+    body.style.overflow = 'hidden';
+    // eslint-disable-next-line no-unused-expressions
+    void body.offsetHeight; // force reflow so the browser sees the starting point
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        body.style.transition = 'max-height .28s ease';
+        body.style.maxHeight = targetH + 'px';
+      });
+    });
+    let done = false;
+    const safety = setTimeout(()=>{ if (!done){ done = true; finish(closing); } }, 400);
+    body.addEventListener('transitionend', function h(){
+      if (done) return;
+      done = true;
+      clearTimeout(safety);
+      body.removeEventListener('transitionend', h);
+      finish(closing);
+    }, {once:true});
+  }
+
+  summary.addEventListener('click', (e)=>{
+    e.preventDefault();
+    if (animating) return;
+    animating = true;
+    if (det.open){
+      body.style.maxHeight = body.scrollHeight + 'px';
+      animateTo(0, true);
+    } else {
+      det.open = true;
+      const targetH = body.scrollHeight;
+      body.style.maxHeight = '0px';
+      animateTo(targetH, false);
+    }
+  });
+});
 
 // ---- category tabs ----
 const tabsWrap = document.getElementById('category-tabs');

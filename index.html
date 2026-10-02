@@ -324,7 +324,7 @@
     </div>
     <div class="topbar-left">
       <div class="topbar-title">Lely KDW</div>
-      <div class="topbar-sub">Letzte Aktualisierung: 14.09.2026</div>
+      <div class="topbar-sub">Letzte Aktualisierung: 02.10.2026</div>
     </div>
     <button type="button" class="topbar-settings" id="btn-settings" aria-label="Einstellungen">⚙</button>
   </div>
@@ -438,7 +438,7 @@
       <button type="button" class="modal-choice-btn" id="btn-open-addhome" style="width:100%;text-align:center;">📱 Zum Startbildschirm hinzufügen</button>
     </div>
     <button type="button" class="modal-cancel" id="btn-settings-close">Schließen</button>
-    <div style="margin-top:20px;text-align:center;font-size:11px;color:var(--muted);">Letzte Aktualisierung: 14.09.2026</div>
+    <div style="margin-top:20px;text-align:center;font-size:11px;color:var(--muted);">Letzte Aktualisierung: 02.10.2026</div>
     <div style="margin-top:8px;text-align:center;font-size:11px;color:var(--muted);">© 2026 Karel Baloun, k.baloun@eder-gmbh.de — Alle Rechte vorbehalten</div>
   </div>
 </div>
@@ -702,7 +702,7 @@ Object.keys(categories).forEach(catName=>{
     groupItems.forEach(it=>{
       const row = document.createElement('div');
       row.className = 'item-row zero-qty';
-      row.dataset.search = (it.artikel + ' ' + it.bezeichnung + ' ' + it.gruppe).toLowerCase();
+      row.dataset.search = (it.artikel + ' ' + it.bezeichnung + ' ' + it.gruppe + ' ' + (it.info || '')).toLowerCase();
 
       const thumb = document.createElement('div');
       thumb.className = 'item-thumb' + (it.img===null ? ' empty' : '');
@@ -974,6 +974,7 @@ document.getElementById('btn-reset').addEventListener('click', ()=>{
 // ---- search filter ----
 document.getElementById('search').addEventListener('input', e=>{
   const q = e.target.value.trim().toLowerCase();
+  const tokens = q ? q.split(/\s+/) : [];
   const matchesByCategory = {};
 
   document.querySelectorAll('details.group').forEach(det=>{
@@ -981,7 +982,7 @@ document.getElementById('search').addEventListener('input', e=>{
     const catDiv = det.closest('.category');
     const catName = catDiv ? catDiv.dataset.category : null;
     det.querySelectorAll('.item-row').forEach(row=>{
-      const match = !q || row.dataset.search.includes(q);
+      const match = tokens.every(t => row.dataset.search.includes(t));
       row.style.display = match ? 'flex' : 'none';
       if (match) anyVisible = true;
     });

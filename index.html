@@ -811,6 +811,8 @@ document.querySelectorAll('details.group').forEach(det=>{
   const summary = det.querySelector('summary');
   const body = det.querySelector('.group-body');
   let animating = false;
+  let targetOpen = det.open;
+  let pending = null;
 
   function finish(closing){
     if (closing) det.open = false;
@@ -818,7 +820,29 @@ document.querySelectorAll('details.group').forEach(det=>{
     body.style.maxHeight = '';
     body.style.overflow = '';
     animating = false;
+    if (pending !== null){
+      const p = pending;
+      pending = null;
+      if (p !== det.open) setOpen(p);
+    }
   }
+
+  function setOpen(wantOpen){
+    targetOpen = wantOpen;
+    if (animating){ pending = wantOpen; return; }
+    if (wantOpen === det.open) return;
+    animating = true;
+    if (!wantOpen){
+      body.style.maxHeight = body.scrollHeight + 'px';
+      animateTo(0, true);
+    } else {
+      det.open = true;
+      const targetH = body.scrollHeight;
+      body.style.maxHeight = '0px';
+      animateTo(targetH, false);
+    }
+  }
+  det._setOpen = setOpen;
 
   function animateTo(targetH, closing){
     body.style.overflow = 'hidden';
@@ -831,29 +855,44 @@ document.querySelectorAll('details.group').forEach(det=>{
       });
     });
     let done = false;
-    const safety = setTimeout(()=>{ if (!done){ done = true; finish(closing); } }, 400);
-    body.addEventListener('transitionend', function h(){
+    function onEnd(ev){
+      if (ev && ev.target !== body) return;
+      body.removeEventListener('transitionend', onEnd);
       if (done) return;
       done = true;
       clearTimeout(safety);
-      body.removeEventListener('transitionend', h);
       finish(closing);
-    }, {once:true});
+    }
+    const safety = setTimeout(()=>onEnd(null), 400);
+    body.addEventListener('transitionend', onEnd);
   }
 
   summary.addEventListener('click', (e)=>{
     e.preventDefault();
-    if (animating) return;
-    animating = true;
-    if (det.open){
-      body.style.maxHeight = body.scrollHeight + 'px';
-      animateTo(0, true);
-    } else {
-      det.open = true;
-      const targetH = body.scrollHeight;
-      body.style.maxHeight = '0px';
-      animateTo(targetH, false);
+    const wantOpen = animating ? !targetOpen : !det.open;
+    let closedOthers = false;
+    // accordion: opening a group rolls up the other open ones (not while searching,
+    // because search deliberately opens all matching groups)
+    if (wantOpen && !document.getElementById('search').value.trim()){
+      const cat = det.closest('.category');
+      (cat ? cat.querySelectorAll('details.group') : []).forEach(other=>{
+        if (other !== det && other.open && other._setOpen){
+          other._setOpen(false);
+          closedOthers = true;
+        }
+      });
     }
+    // keep the clicked header where it is on screen while groups above it roll up
+    if (closedOthers){
+      const anchorTop = summary.getBoundingClientRect().top;
+      const t0 = performance.now();
+      (function keep(){
+        const delta = summary.getBoundingClientRect().top - anchorTop;
+        if (Math.abs(delta) > 0.5) window.scrollBy({top: delta, left: 0, behavior: 'instant'});
+        if (performance.now() - t0 < 450) requestAnimationFrame(keep);
+      })();
+    }
+    setOpen(wantOpen);
   });
 });
 

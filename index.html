@@ -23,8 +23,8 @@
     --lely-red:#C8102E;
     --lely-red-dark:#970C22;
     --wurth-red:#E2001A;
-    --berner-blue:#0B5CAD;
-    --berner-blue-dark:#083F7A;
+    --berner-blue:#EB6111;
+    --berner-blue-dark:#B84A0B;
     --ink:#1c1c1c;
     --muted:#6b6b6b;
     --bg:#f5f5f3;
@@ -154,12 +154,12 @@
   .tab-btn.active .tab-lely-label{display:inline;}
 
   .tab-btn[data-category="BERNER"]:hover{border-color:var(--berner-blue);}
-  .tab-btn[data-category="BERNER"].active{background:linear-gradient(135deg,var(--berner-blue),var(--berner-blue-dark));border-color:var(--berner-blue);box-shadow:0 2px 10px rgba(11,92,173,.35),0 1px 0 rgba(255,255,255,.15) inset;}
+  .tab-btn[data-category="BERNER"].active{background:linear-gradient(135deg,var(--berner-blue),var(--berner-blue-dark));border-color:var(--berner-blue);box-shadow:0 2px 10px rgba(235,97,17,.35),0 1px 0 rgba(255,255,255,.15) inset;}
   .tab-berner-label{display:none;}
   .tab-btn.active .tab-berner-label{display:inline;}
   .category[data-category="BERNER"]{--lely-red:var(--berner-blue);--lely-red-dark:var(--berner-blue-dark);}
-  .category[data-category="BERNER"] .item-row:hover{background:rgba(11,92,173,.06);}
-  .category[data-category="BERNER"] .item-qty-wrap input.filled{border-color:var(--berner-blue);background:rgba(11,92,173,.09);box-shadow:0 0 0 3px rgba(11,92,173,.14);}
+  .category[data-category="BERNER"] .item-row:hover{background:rgba(235,97,17,.06);}
+  .category[data-category="BERNER"] .item-qty-wrap input.filled{border-color:var(--berner-blue);background:rgba(235,97,17,.09);box-shadow:0 0 0 3px rgba(235,97,17,.14);}
 
   .search-wrap{max-width:1100px;margin:16px auto 0;padding:0 0;}
   .search-box{
@@ -295,6 +295,9 @@
     .item-row{flex-wrap:wrap;}
     .item-thumb .preview{left:0;top:50px;width:180px;height:180px;}
     .topbar-title{font-size:.92rem;}
+    .category-tabs{gap:6px;flex-wrap:nowrap;}
+    .tab-btn{flex:1 1 0;min-width:0;padding:0 6px;font-size:.85rem;gap:5px;}
+    .tab-btn .tab-icon{max-width:100%;}
   }
 
   #print-table-wrap{display:none;}
@@ -930,7 +933,7 @@ catNames.forEach((catName, i)=>{
   } else if (catName === 'LELY'){
     btn.innerHTML = '<svg class="tab-icon" width="44" height="28" viewBox="0 0 220 140"><rect width="220" height="140" rx="14" fill="#C8102E"/><ellipse cx="110" cy="70" rx="93" ry="50" fill="none" stroke="#ffffff" stroke-width="6.5"/><g transform="translate(110,70) skewX(-10) translate(-110,-70)"><text x="110" y="88" font-family="Arial, sans-serif" font-weight="900" font-size="50" fill="#ffffff" text-anchor="middle" letter-spacing="-2">LELY</text></g></svg><span class="tab-lely-label">' + catName + '</span>';
   } else if (catName === 'BERNER'){
-    btn.innerHTML = '<svg class="tab-icon" width="62" height="24" viewBox="0 0 160 62"><rect width="160" height="62" rx="9" fill="#0B5CAD"/><text x="80" y="42" font-family="Arial, sans-serif" font-weight="900" font-size="30" fill="#ffffff" text-anchor="middle" letter-spacing="1">BERNER</text></svg><span class="tab-berner-label">' + catName + '</span>';
+    btn.innerHTML = '<svg class="tab-icon" width="62" height="24" viewBox="0 0 160 62"><rect width="160" height="62" rx="9" fill="#1c1c1c"/><rect x="14" y="50" width="132" height="5" rx="2.5" fill="#EB6111"/><text x="80" y="40" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="#ffffff" text-anchor="middle" letter-spacing="1">BERNER</text></svg><span class="tab-berner-label">' + catName + '</span>';
   } else {
     btn.textContent = catName;
   }

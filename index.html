@@ -240,6 +240,9 @@
   .item-qty-wrap input.filled{border-color:var(--lely-red);background:rgba(200,16,46,.08);font-weight:700;box-shadow:0 0 0 3px rgba(200,16,46,.12);}
   .item-unit{font-size:.78rem;color:var(--muted);width:44px;flex:0 0 auto;}
 
+  .bar-short{display:none;}
+  @media (max-width:600px){.bar-short{display:inline;}}
+
   .hidden{display:none !important;}
 
   footer.bar{
@@ -298,6 +301,14 @@
     .category-tabs{gap:6px;flex-wrap:nowrap;}
     .tab-btn{flex:1 1 0;min-width:0;padding:0 6px;font-size:.85rem;gap:5px;}
     .tab-btn .tab-icon{max-width:100%;}
+    body{padding-bottom:130px;}
+    footer.bar{padding:10px 14px;}
+    .bar-inner{gap:8px;}
+    .bar-spacer{display:none;}
+    .cart-count{flex:0 0 auto;padding:7px 12px 7px 9px;}
+    footer.bar button.secondary{flex:1 1 0;min-width:0;padding:10px 6px;font-size:.82rem;white-space:nowrap;}
+    footer.bar button.primary{flex:1 1 100%;padding:11px 16px;}
+    .bar-long{display:none;}
   }
 
   #print-table-wrap{display:none;}
@@ -384,7 +395,7 @@
     <div class="cart-preview" id="cart-preview"></div>
     <div class="bar-spacer"></div>
     <button class="secondary" id="btn-reset">Zurücksetzen</button>
-    <button class="secondary" id="btn-print">Drucken / als PDF speichern</button>
+    <button class="secondary" id="btn-print">Drucken<span class="bar-long"> / als PDF speichern</span><span class="bar-short"> / PDF</span></button>
     <button class="primary" id="btn-send">Bestellung per E-Mail senden</button>
   </div>
 </footer>

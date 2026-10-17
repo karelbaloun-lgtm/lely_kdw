@@ -458,6 +458,10 @@
         </button>
       </div>
     </div>
+    <div class="settings-section" id="settings-bestand-section">
+      <div class="settings-label">Inventur</div>
+      <a class="modal-choice-btn" id="link-bestand" href="https://kdw-lely.netlify.app/bestand/" target="_blank" rel="noopener" style="display:block;width:100%;text-align:center;text-decoration:none;">📦 Bestand zählen</a>
+    </div>
     <div class="settings-section">
       <button type="button" class="modal-choice-btn" id="btn-open-addhome" style="width:100%;text-align:center;">📱 Zum Startbildschirm hinzufügen</button>
     </div>
@@ -578,6 +582,9 @@ function maybeShowNetlifyNotice(){
 if (IS_LIVE_NETLIFY_SITE){
   const settingsNetlifySection = document.getElementById('settings-netlify-section');
   if (settingsNetlifySection) settingsNetlifySection.remove();
+  // auf der Live-Seite relativ verlinken (bleibt gültig, falls sich der Netlify-Name ändert)
+  const linkBestand = document.getElementById('link-bestand');
+  if (linkBestand) linkBestand.setAttribute('href', '/bestand/');
 }
 function closeNetlifyNotice(){
   const modal = document.getElementById('netlify-notice-modal');

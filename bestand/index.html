@@ -169,8 +169,7 @@
       <b>Ergebnis als Excel exportieren</b>
       <p>Erstellt eine Excel-Datei mit Soll, Ist, Differenz und Status (farbig) sowie einem Blatt nur mit den Abweichungen.</p>
       <div class="btns">
-        <button type="button" class="primary" id="btn-export">📥 Excel herunterladen</button>
-        <button type="button" class="secondary hidden" id="btn-share">📤 Teilen</button>
+        <button type="button" class="primary" id="btn-export">📥 Als Excel exportieren</button>
       </div>
     </div>
     <div class="foot" id="foot"></div>
@@ -571,15 +570,6 @@ $('btn-export').addEventListener('click', () => {
   const { blob, name } = buildExport();
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-});
-try {
-  const probe = new File(['x'], 'x.xlsx', { type: XLSX_MIME });
-  if (navigator.canShare && navigator.canShare({ files: [probe] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) $('btn-share').classList.remove('hidden');
-} catch(e){}
-$('btn-share').addEventListener('click', async () => {
-  if (!exportOk()) return;
-  const { blob, name } = buildExport();
-  try { await navigator.share({ files: [new File([blob], name, { type: XLSX_MIME })], title: 'Inventur ' + (state.list.lagerort || '') }); } catch(e){}
 });
 
 // ===== Lightbox =====

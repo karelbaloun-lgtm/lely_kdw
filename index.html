@@ -102,6 +102,7 @@
   .modal-box{
     position:relative;background:var(--card);border-radius:14px;max-width:380px;width:100%;padding:22px 22px 18px;
     box-shadow:0 8px 30px rgba(0,0,0,.25);
+    max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
   }
   .modal-x{
     position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;border:none;
@@ -156,6 +157,7 @@
   }
   .help-sub{display:block;margin-top:2px;color:var(--muted);font-size:.78rem;}
   .settings-sub{font-size:.78rem;color:var(--muted);margin:-4px 0 8px;}
+  .settings-select{width:100%;padding:11px 10px;border:1.5px solid var(--border);border-radius:10px;font-size:.95rem;font-weight:600;background:var(--card);color:var(--ink);}
   #btn-open-addhome{font-size:.88rem;padding-left:8px;padding-right:8px;}
   .font-btn{flex:1;padding:10px 0;border-radius:7px;border:1px solid transparent;background:none;cursor:pointer;font-size:.9rem;font-weight:600;line-height:1;color:var(--ink);}
   .font-btn.active{background:var(--card);border-color:var(--border);}
@@ -460,7 +462,7 @@
     <h3>Einstellungen</h3>
     <div class="settings-section">
       <div class="settings-label">Name</div>
-      <div class="modal-actions" id="settings-name-list"></div>
+      <select id="settings-name-select" class="settings-select" aria-label="Name"></select>
     </div>
     <div class="settings-section">
       <div class="settings-label">Design</div>
@@ -686,22 +688,22 @@ try { savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'auto'; } catch(e)
 applyTheme(savedTheme);
 
 function renderSettingsNameList(){
-  const list = document.getElementById('settings-name-list');
-  list.innerHTML = '';
+  const dd = document.getElementById('settings-name-select');
+  dd.innerHTML = '';
+  const ph = document.createElement('option');
+  ph.value = ''; ph.textContent = '-- bitte wählen --';
+  dd.appendChild(ph);
   PEOPLE.forEach((p, idx) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'modal-choice-btn';
-    if (String(idx) === sel.value) btn.style.borderColor = 'var(--lely-red)';
-    btn.textContent = p.name;
-    btn.addEventListener('click', () => {
-      sel.value = String(idx);
-      updatePerson();
-      settingsModal.classList.add('hidden');
-    });
-    list.appendChild(btn);
+    const o = document.createElement('option');
+    o.value = String(idx); o.textContent = p.name;
+    dd.appendChild(o);
   });
+  dd.value = sel.value;
 }
+document.getElementById('settings-name-select').addEventListener('change', (e) => {
+  sel.value = e.target.value;
+  updatePerson();
+});
 
 document.getElementById('btn-settings').addEventListener('click', () => {
   renderSettingsNameList();

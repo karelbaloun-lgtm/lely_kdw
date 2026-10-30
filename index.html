@@ -290,6 +290,18 @@
     width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--card);color:var(--ink);
   }
   .field.readonly input{background:var(--surface2);color:var(--muted);}
+  /* Bestellart "Material für Kunden": Kundenkarte, Eingabedialog */
+  .kunde-card{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .kunde-card .kc-label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;}
+  .kunde-card .kc-main{font-weight:700;color:var(--ink);word-break:break-word;}
+  .kunde-card .kc-sub{font-size:.85rem;color:var(--muted);word-break:break-word;}
+  .kunde-card .kc-edit{flex:0 0 auto;padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);color:var(--ink);font-size:.85rem;font-weight:700;cursor:pointer;}
+  .kunde-card .kc-edit:hover{border-color:var(--lely-red);}
+  .kunde-card.hidden{display:none;}
+  .modal-fields{display:flex;flex-direction:column;gap:12px;margin-bottom:14px;}
+  .modal-fields .req{color:var(--lely-red);}
+  .modal-error{color:var(--lely-red);font-size:.85rem;font-weight:700;margin:0 0 12px;}
+  .modal-choice-btn.modal-primary{background:linear-gradient(135deg,var(--lely-red),var(--lely-red-dark));border-color:var(--lely-red);color:#fff;text-align:center;}
 
   .modal-overlay{
     position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;
@@ -594,6 +606,15 @@
   </div>
 </div>
 
+<div class="meta-card kunde-card hidden" id="kunde-card">
+  <div>
+    <div class="kc-label">Material für Kunden</div>
+    <div class="kc-main" id="kc-main"></div>
+    <div class="kc-sub" id="kc-sub"></div>
+  </div>
+  <button type="button" class="kc-edit" id="btn-kunde-edit">Ändern</button>
+</div>
+
 <div class="category-tabs" id="category-tabs"></div>
 
 <div class="search-wrap">
@@ -626,6 +647,71 @@
     <button class="lightbox-close" id="lightbox-close" aria-label="Schließen">&times;</button>
     <img id="lightbox-img" src="" alt="">
     <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+</div>
+
+<div id="mode-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3>Was möchten Sie bestellen?</h3>
+    <p>Bitte Bestellart wählen.</p>
+    <div class="modal-actions">
+      <button type="button" class="modal-choice-btn" id="btn-mode-kdw">
+        KDW
+        <span class="sub">Verbrauchsmaterial, Einbaumaterial (LELY, Würth, Berner)</span>
+      </button>
+      <button type="button" class="modal-choice-btn" id="btn-mode-kunde">
+        Material für Kunden
+        <span class="sub">Fehlendes Material beim Kunden nachbestellen (nur LELY)</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="kunde-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3>Kundendaten</h3>
+    <p>Für welchen Kunden wird das Material benötigt?</p>
+    <div class="modal-fields">
+      <div class="field"><label for="kunde-name">Kunde (Name) <span class="req">*</span></label><input id="kunde-name" type="text" autocomplete="off"></div>
+      <div class="field"><label for="kunde-ort">PLZ / Ort <span class="req">*</span></label><input id="kunde-ort" type="text" autocomplete="off"></div>
+      <div class="field"><label for="kunde-nr">Kundennr.</label><input id="kunde-nr" type="text" autocomplete="off"></div>
+      <div class="field"><label for="kunde-projekt">Projektnr.</label><input id="kunde-projekt" type="text" autocomplete="off"></div>
+    </div>
+    <div class="modal-error hidden" id="kunde-error">Bitte Name und PLZ/Ort des Kunden eintragen.</div>
+    <button type="button" class="modal-choice-btn modal-primary" id="btn-kunde-ok" style="width:100%;">Weiter</button>
+    <button type="button" class="modal-cancel" id="btn-kunde-cancel">Zurück</button>
+  </div>
+</div>
+
+<div id="ship-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3>Wie soll das Material geliefert werden?</h3>
+    <div class="modal-actions">
+      <button type="button" class="modal-choice-btn" id="btn-ship-express">
+        Express-Versand
+        <span class="sub">Lieferung an den Kunden</span>
+      </button>
+      <button type="button" class="modal-choice-btn" id="btn-ship-normal">Normaler Versand</button>
+    </div>
+    <button type="button" class="modal-cancel" id="btn-ship-cancel">Abbrechen</button>
+  </div>
+</div>
+
+<div id="ship2-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3>Normaler Versand</h3>
+    <p>Wohin soll das Material geliefert werden?</p>
+    <div class="modal-actions">
+      <button type="button" class="modal-choice-btn" id="btn-ship-kunde">
+        Lieferung an den Kunden
+        <span class="sub" id="btn-ship-kunde-sub"></span>
+      </button>
+      <button type="button" class="modal-choice-btn" id="btn-ship-abholung">
+        Abholung im LC Wernberg
+        <span class="sub">Dr.-Fritz-Loew Straße 14, 92533 Wernberg-Köblitz</span>
+      </button>
+    </div>
+    <button type="button" class="modal-cancel" id="btn-ship2-back">Zurück</button>
   </div>
 </div>
 
@@ -692,6 +778,10 @@
       <a class="modal-choice-btn" id="link-bestand" href="https://kdw-lely.netlify.app/bestand/" target="_blank" rel="noopener" style="display:block;width:100%;text-align:center;text-decoration:none;">📦 Bestand zählen</a>
     </div>
     <div class="settings-section">
+      <div class="settings-label">Bestellart</div>
+      <button type="button" class="modal-choice-btn" id="btn-switch-mode" style="width:100%;text-align:center;">🔄 Bestellart wechseln</button>
+    </div>
+    <div class="settings-section">
       <button type="button" class="modal-choice-btn" id="btn-open-addhome" style="width:100%;text-align:center;">📱 Zum Startbildschirm hinzufügen</button>
     </div>
     <button type="button" class="modal-cancel" id="btn-settings-close">Schließen</button>
@@ -747,6 +837,10 @@ const IMAGES = ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgH
 const TARGET_EMAIL = "s.hartl@eder-gmbh.de";
 const CC_EMAIL = "k.baloun@eder-gmbh.de";
 const AUTHOR_EMAIL = "k.baloun@eder-gmbh.de";
+const KUNDE_TARGET_EMAIL = "T.Schirdewahn@eder-gmbh.de";   // Bestellart "Material für Kunden"
+const WERNBERG_ADDRESS = "Dr.-Fritz-Loew Straße 14, 92533 Wernberg-Köblitz";
+let MODE = null;   // 'kdw' | 'kunde' (wird beim Start gewählt)
+let KUNDE = { name: '', ort: '', nr: '', projekt: '' };
 
 // ---- populate Einbauer select ----
 const sel = document.getElementById('sel-einbauer');
@@ -797,14 +891,12 @@ if (!savedEinbauerName){
       sel.value = String(idx);
       updatePerson();
       welcomeModal.classList.add('hidden');
-      maybeShowNetlifyNotice();
+      showModeModal();
     });
     welcomeList.appendChild(btn);
   });
   welcomeModal.classList.remove('hidden');
-} else {
-  maybeShowNetlifyNotice();
-}
+}   // sonst: Bestellart-Auswahl am Ende des Skripts
 
 // ---- notice to use the live Netlify link instead of this (possibly stale) file ----
 function maybeShowNetlifyNotice(){
@@ -1059,7 +1151,8 @@ Object.keys(categories).forEach(catName=>{
 });
 
 // ---- draft auto-save/restore: don't lose an unsent order on accidental close ----
-const DRAFT_KEY = 'kdw_draft_order';
+const draftKey = () => MODE === 'kunde' ? 'kdw_draft_kunde' : 'kdw_draft_order';
+const KUNDE_KEY = 'kdw_kunde_info';
 function saveDraft(){
   const draft = {};
   ITEMS.forEach(it => {
@@ -1067,16 +1160,16 @@ function saveDraft(){
     if (v > 0) draft[it.artikel] = it._qtyInput.value;
   });
   try {
-    if (Object.keys(draft).length > 0) localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-    else localStorage.removeItem(DRAFT_KEY);
+    if (Object.keys(draft).length > 0) localStorage.setItem(draftKey(), JSON.stringify(draft));
+    else localStorage.removeItem(draftKey());
   } catch(e){}
 }
 function clearDraft(){
-  try { localStorage.removeItem(DRAFT_KEY); } catch(e){}
+  try { localStorage.removeItem(draftKey()); if (MODE === 'kunde') localStorage.removeItem(KUNDE_KEY); } catch(e){}
 }
 function restoreDraft(){
   let draft = null;
-  try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch(e){}
+  try { draft = JSON.parse(localStorage.getItem(draftKey()) || 'null'); } catch(e){}
   if (!draft) return;
   ITEMS.forEach(it => {
     if (draft[it.artikel] != null){
@@ -1088,7 +1181,7 @@ function restoreDraft(){
   });
   updateCartCount();
 }
-restoreDraft();
+// (restoreDraft wird nach der Wahl der Bestellart aufgerufen, siehe applyMode)
 
 // ---- animated group expand/collapse (native <details> has no transition) ----
 document.querySelectorAll('details.group').forEach(det=>{
@@ -1322,12 +1415,12 @@ document.getElementById('search').addEventListener('input', e=>{
     }
   });
 
-  if (q && catNames.length > 1){
+  if (q && allowedCats().length > 1){
     const activeBtn = [...tabsWrap.querySelectorAll('.tab-btn')].find(b => b.classList.contains('active'));
     const activeCat = activeBtn ? activeBtn.dataset.category : null;
     const activeHasMatch = activeCat && matchesByCategory[activeCat] > 0;
     if (!activeHasMatch){
-      const otherWithMatch = catNames.find(name => matchesByCategory[name] > 0 && name !== activeCat);
+      const otherWithMatch = allowedCats().find(name => matchesByCategory[name] > 0 && name !== activeCat);
       if (otherWithMatch){
         selectTab(otherWithMatch);
       }
@@ -1428,7 +1521,7 @@ Diese E-Mail wurde automatisch mit dem internen Bestellformular „Lely KDW“ e
 Bei Fragen wenden Sie sich bitte an den Autor der Anwendung: ${AUTHOR_EMAIL}
 `;
   const subject = `Bestellung Einbaumaterial - ${p.name} - ${datum}`;
-  const mailto = `mailto:${TARGET_EMAIL}?cc=${encodeURIComponent(CC_EMAIL)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const mailto = `mailto:${TARGET_EMAIL}?bcc=${encodeURIComponent(CC_EMAIL)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   clearDraft();
   window.location.href = mailto;
 }
@@ -1441,6 +1534,11 @@ document.getElementById('btn-send').addEventListener('click', ()=>{
   const chosen = ITEMS.filter(it => parseFloat(it._qtyInput.value) > 0);
   if (chosen.length === 0){
     alert('Bitte zuerst mindestens einen Artikel mit Menge eingeben.');
+    return;
+  }
+  if (MODE === 'kunde'){
+    if (!KUNDE.name || !KUNDE.ort){ openKundeModal(); return; }
+    shipModal.classList.remove('hidden');
     return;
   }
   const p = PEOPLE[sel.value];
@@ -1528,6 +1626,138 @@ document.getElementById('btn-print').addEventListener('click', ()=>{
   document.getElementById('print-table-wrap').innerHTML = result.html;
   window.print();
 });
+
+// ---- Bestellart: KDW (Lager) oder Material für Kunden ----
+const modeModal = document.getElementById('mode-modal');
+const kundeModal = document.getElementById('kunde-modal');
+const shipModal = document.getElementById('ship-modal');
+const ship2Modal = document.getElementById('ship2-modal');
+const kundeCard = document.getElementById('kunde-card');
+
+function allowedCats(){
+  return MODE === 'kunde' ? catNames.filter(n => n === 'LELY') : catNames;
+}
+function showModeModal(){ modeModal.classList.remove('hidden'); }
+
+function renderKundeCard(){
+  document.getElementById('kc-main').textContent = [KUNDE.name, KUNDE.ort].filter(Boolean).join(', ');
+  document.getElementById('kc-sub').textContent = [KUNDE.nr && 'Kundennr.: ' + KUNDE.nr, KUNDE.projekt && 'Projektnr.: ' + KUNDE.projekt].filter(Boolean).join(' · ');
+}
+function applyMode(mode){
+  MODE = mode;
+  ITEMS.forEach(it => {   // Mengen der anderen Bestellart ausblenden; jede Bestellart hat ihren eigenen Entwurf
+    it._qtyInput.value = '';
+    it._qtyInput.classList.remove('filled');
+    it._rowEl.classList.add('zero-qty');
+  });
+  restoreDraft();
+  const kunde = mode === 'kunde';
+  kundeCard.classList.toggle('hidden', !kunde);
+  if (kunde){
+    tabsWrap.style.display = 'none';
+    selectTab('LELY');
+    renderKundeCard();
+  } else {
+    tabsWrap.style.display = catNames.length > 1 ? '' : 'none';
+    if (catNames.length > 1) selectTab(catNames[0]);
+  }
+  document.getElementById('search').value = '';
+  document.getElementById('search').dispatchEvent(new Event('input'));
+  updateCartCount();
+}
+
+function openKundeModal(){
+  document.getElementById('kunde-name').value = KUNDE.name;
+  document.getElementById('kunde-ort').value = KUNDE.ort;
+  document.getElementById('kunde-nr').value = KUNDE.nr;
+  document.getElementById('kunde-projekt').value = KUNDE.projekt;
+  document.getElementById('kunde-error').classList.add('hidden');
+  kundeModal.classList.remove('hidden');
+  document.getElementById('kunde-name').focus();
+}
+document.getElementById('btn-mode-kdw').addEventListener('click', ()=>{
+  modeModal.classList.add('hidden');
+  applyMode('kdw');
+  maybeShowNetlifyNotice();
+});
+document.getElementById('btn-mode-kunde').addEventListener('click', ()=>{
+  modeModal.classList.add('hidden');
+  try {   // zuletzt eingegebene Kundendaten (unversendeter Entwurf) vorbelegen
+    const saved = JSON.parse(localStorage.getItem(KUNDE_KEY) || 'null');
+    if (saved) KUNDE = Object.assign({ name: '', ort: '', nr: '', projekt: '' }, saved);
+  } catch(e){}
+  openKundeModal();
+});
+document.getElementById('btn-kunde-ok').addEventListener('click', ()=>{
+  const v = id => document.getElementById(id).value.trim();
+  if (!v('kunde-name') || !v('kunde-ort')){
+    document.getElementById('kunde-error').classList.remove('hidden');
+    return;
+  }
+  KUNDE = { name: v('kunde-name'), ort: v('kunde-ort'), nr: v('kunde-nr'), projekt: v('kunde-projekt') };
+  try { localStorage.setItem(KUNDE_KEY, JSON.stringify(KUNDE)); } catch(e){}
+  kundeModal.classList.add('hidden');
+  if (MODE === 'kunde'){ renderKundeCard(); }
+  else { applyMode('kunde'); maybeShowNetlifyNotice(); }
+});
+document.getElementById('btn-kunde-cancel').addEventListener('click', ()=>{
+  kundeModal.classList.add('hidden');
+  if (MODE !== 'kunde') showModeModal();
+});
+document.getElementById('btn-kunde-edit').addEventListener('click', openKundeModal);
+document.getElementById('btn-switch-mode').addEventListener('click', ()=>{
+  settingsModal.classList.add('hidden');
+  showModeModal();
+});
+
+// Versandart (Express / normal -> Kunde oder Abholung in Wernberg)
+document.getElementById('btn-ship-express').addEventListener('click', ()=>{ shipModal.classList.add('hidden'); sendKundeOrder('express'); });
+document.getElementById('btn-ship-normal').addEventListener('click', ()=>{
+  shipModal.classList.add('hidden');
+  document.getElementById('btn-ship-kunde-sub').textContent = [KUNDE.name, KUNDE.ort].filter(Boolean).join(', ');
+  ship2Modal.classList.remove('hidden');
+});
+document.getElementById('btn-ship-cancel').addEventListener('click', ()=> shipModal.classList.add('hidden'));
+document.getElementById('btn-ship-kunde').addEventListener('click', ()=>{ ship2Modal.classList.add('hidden'); sendKundeOrder('kunde'); });
+document.getElementById('btn-ship-abholung').addEventListener('click', ()=>{ ship2Modal.classList.add('hidden'); sendKundeOrder('abholung'); });
+document.getElementById('btn-ship2-back').addEventListener('click', ()=>{ ship2Modal.classList.add('hidden'); shipModal.classList.remove('hidden'); });
+[shipModal, ship2Modal].forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.add('hidden'); }));
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){ shipModal.classList.add('hidden'); ship2Modal.classList.add('hidden'); }
+});
+
+function sendKundeOrder(versand){
+  const chosen = ITEMS.filter(it => parseFloat(it._qtyInput.value) > 0);
+  const p = PEOPLE[sel.value];
+  const datum = formatDateDE(dateInput.value);
+  const kundeAdresse = `${KUNDE.name}, ${KUNDE.ort}`;
+  let body = `Hallo,\n\nbitte um Zusendung des fehlenden Materials:\n\n`;
+  body += alignColumns([['Artikelnummer', 'Bezeichnung', 'Menge'],
+    ...chosen.map(it => [it.artikel || '', itemFullName(it), formatQtyWithBundle(it, it._qtyInput.value)])]) + '\n';
+  body += `\n------------------------------------------\nKUNDE:\nName: ${KUNDE.name}\nPLZ / Ort: ${KUNDE.ort}\n`;
+  if (KUNDE.nr) body += `Kundennr.: ${KUNDE.nr}\n`;
+  if (KUNDE.projekt) body += `Projektnr.: ${KUNDE.projekt}\n`;
+  body += `\nVERSAND: ${versand === 'express' ? 'Express' : 'Normal'}\n`;
+  if (versand === 'abholung'){
+    body += `LIEFERADRESSE:\nAbholung im Lely Center Wernberg\n${WERNBERG_ADDRESS}\n`;
+  } else {
+    body += `LIEFERADRESSE:\nLieferung an den Kunden: ${kundeAdresse}\n`;
+  }
+  body += `\nEinbauer: ${p.name}\nDatum: ${datum}\n`;
+  body += `\nBitte auf Projekt buchen\n`;
+  body += `
+------------------------------------------
+Diese E-Mail wurde automatisch mit dem internen Bestellformular „Lely KDW“ erstellt.
+Bei Fragen wenden Sie sich bitte an den Autor der Anwendung: ${AUTHOR_EMAIL}
+`;
+  const subject = `${versand === 'express' ? 'EXPRESS - ' : ''}Material Kunde - ${KUNDE.name}, ${KUNDE.ort} - ${datum}`;
+  const mailto = `mailto:${KUNDE_TARGET_EMAIL}?bcc=${encodeURIComponent(CC_EMAIL)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  clearDraft();
+  window.location.href = mailto;
+}
+
+// Start: Bestellart wählen (beim ersten Besuch erst nach der Namenswahl, siehe Willkommens-Dialog)
+if (savedEinbauerName) showModeModal();
 
 // ---- lightbox ----
 const lightbox = document.getElementById('lightbox');

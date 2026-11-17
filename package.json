@@ -1,0 +1,9 @@
+{
+  "name": "kdw-lely",
+  "private": true,
+  "description": "Lely KDW - Bestell- und Bestands-Apps (statische Seiten + Funktion fuer den Auto-Bestand)",
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

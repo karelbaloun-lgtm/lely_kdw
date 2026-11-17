@@ -1,5 +1,14 @@
 *
-!index.html
 !.gitignore
+!index.html
+!kdw/
+!kdw/index.html
 !bestand/
 !bestand/index.html
+!auto/
+!auto/index.html
+!package.json
+!netlify.toml
+!netlify/
+!netlify/functions/
+!netlify/functions/*.mjs

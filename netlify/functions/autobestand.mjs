@@ -33,6 +33,7 @@ export async function handle(req, lagerort, store) {
   return json({ error: "Methode nicht erlaubt" }, 405);
 }
 
-export default async (req, context) => handle(req, context.params.lagerort, getStore("autobestand"));
+// consistency "strong": Blobs liest sonst eventuell (verzögert) -> Lesen direkt nach dem Schreiben lieferte alten/leeren Stand
+export default async (req, context) => handle(req, context.params.lagerort, getStore({ name: "autobestand", consistency: "strong" }));
 
 export const config = { path: "/api/autobestand/:lagerort" };

@@ -9,6 +9,57 @@
 <script>(function(){ var t='auto'; try{ t = localStorage.getItem('kdw_theme')||'auto'; }catch(e){} document.documentElement.setAttribute('data-theme', t); })();</script>
 <link rel="stylesheet" href="/assets/fonts.css">
 <script>(function(){ var f = 'lely'; try{ f = localStorage.getItem('kdw_font') || 'lely'; }catch(e){} document.documentElement.setAttribute('data-font', f === 'system' ? 'system' : 'lely'); })();</script>
+<style id="splash-css">
+/* Lade-Animation (Liquid Glass, Vektor): erscheint erst, wenn das Laden länger als ~0,25 s dauert, und verschwindet, sobald die Seite fertig ist */
+#splash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;overflow:hidden;
+  background:#eceff3;opacity:0;animation:sp-in .35s ease .25s forwards;transition:opacity .4s ease, visibility .4s;}
+:root[data-theme="dark"] #splash{background:#0b0d11;}
+@media (prefers-color-scheme: dark){ :root[data-theme="auto"] #splash{background:#0b0d11;} }
+#splash.sp-done{opacity:0 !important;visibility:hidden;animation:none;}
+@keyframes sp-in{to{opacity:1}}
+#splash .sp-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.75;will-change:transform;}
+#splash .sp-o1{width:340px;height:340px;left:-80px;top:-60px;background:radial-gradient(circle,rgba(200,16,46,.30),transparent 70%);animation:sp-float1 7s ease-in-out infinite alternate;}
+#splash .sp-o2{width:380px;height:380px;right:-120px;bottom:-80px;background:radial-gradient(circle,rgba(70,110,220,.24),transparent 70%);animation:sp-float2 8s ease-in-out infinite alternate;}
+@keyframes sp-float1{to{transform:translate(70px,50px) scale(1.15)}}
+@keyframes sp-float2{to{transform:translate(-60px,-40px) scale(1.1)}}
+#splash .sp-card{position:relative;width:132px;height:132px;border-radius:34px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.8);box-shadow:0 18px 50px rgba(15,23,42,.14), inset 0 1px 0 rgba(255,255,255,.9);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);animation:sp-bob 2.6s ease-in-out infinite alternate;}
+:root[data-theme="dark"] #splash .sp-card{background:rgba(30,33,41,.55);border-color:rgba(255,255,255,.12);box-shadow:0 18px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);}
+@media (prefers-color-scheme: dark){ :root[data-theme="auto"] #splash .sp-card{background:rgba(30,33,41,.55);border-color:rgba(255,255,255,.12);box-shadow:0 18px 50px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);} }
+@keyframes sp-bob{from{transform:translateY(-4px)}to{transform:translateY(4px)}}
+#splash .sp-logo{width:92px;height:auto;overflow:visible;}
+#splash .sp-box{fill:#C8102E;transform-origin:110px 70px;animation:sp-pop .7s cubic-bezier(.2,.9,.3,1.2) both;}
+#splash .sp-ring{fill:none;stroke:#fff;stroke-width:6.5;stroke-dasharray:540;stroke-dashoffset:540;animation:sp-draw 1.4s ease-in-out .15s infinite alternate;}
+#splash .sp-word{fill:#fff;font-family:Arial,sans-serif;font-weight:900;font-size:50px;letter-spacing:-2px;text-anchor:middle;opacity:0;animation:sp-fade .6s ease .35s forwards;}
+@keyframes sp-pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes sp-draw{to{stroke-dashoffset:0}}
+@keyframes sp-fade{to{opacity:1}}
+#splash .sp-bar{position:relative;width:132px;height:4px;border-radius:4px;background:rgba(120,130,150,.22);overflow:hidden;}
+#splash .sp-bar i{position:absolute;top:0;bottom:0;width:44%;border-radius:4px;background:linear-gradient(90deg,transparent,#C8102E,transparent);animation:sp-slide 1.25s ease-in-out infinite;}
+@keyframes sp-slide{from{left:-45%}to{left:101%}}
+@media (prefers-reduced-motion: reduce){
+  #splash .sp-orb,#splash .sp-card,#splash .sp-box,#splash .sp-bar i{animation:none !important;}
+  #splash .sp-ring{animation:none;stroke-dashoffset:0;} #splash .sp-word{animation:none;opacity:1;}
+}
+@media print{#splash{display:none !important}}
+</style>
+<script id="splash-js">
+(function(){
+  var t0 = Date.now(), demo = /[?&]splash(=1|&|$)/.test(location.search), done = false;
+  function hide(){
+    if (done) return; done = true;
+    var el = document.getElementById('splash'); if (!el) return;
+    var shown = Date.now() - t0 > 250;                  // war sie schon sichtbar? dann kurz stehen lassen, damit es nicht blitzt
+    var wait = shown ? Math.max(0, 900 - (Date.now() - t0)) : 0;
+    if (demo) wait = Math.max(wait, 3500 - (Date.now() - t0));   // ?splash=1 zeigt die Animation zum Ansehen
+    setTimeout(function(){ el.classList.add('sp-done'); setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 500); }, wait);
+  }
+  function ready(){ requestAnimationFrame(function(){ requestAnimationFrame(hide); }); setTimeout(hide, 120); }   // setTimeout: auch wenn der Tab im Hintergrund lädt
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
+  setTimeout(hide, 12000);                                // Sicherheitsnetz
+})();
+</script>
 <style>
 
   :root{
@@ -477,6 +528,18 @@
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true">
+  <div class="sp-orb sp-o1"></div><div class="sp-orb sp-o2"></div>
+  <div class="sp-card">
+    <svg class="sp-logo" viewBox="0 0 220 140" aria-hidden="true">
+      <rect class="sp-box" x="0" y="0" width="220" height="140" rx="14"/>
+      <ellipse class="sp-ring" cx="110" cy="70" rx="93" ry="50"/>
+      <g transform="translate(110,70) skewX(-10) translate(-110,-70)"><text class="sp-word" x="110" y="88">LELY</text></g>
+    </svg>
+  </div>
+  <div class="sp-bar"><i></i></div>
+</div>
+
 <header class="topbar">
   <div class="topbar-row1">
     <div class="topbar-left">

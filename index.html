@@ -304,7 +304,7 @@
     </svg>
     <div class="topbar-left">
       <div class="topbar-title">Lely KDW</div>
-      <div class="topbar-sub">Letzte Aktualisierung: 17.11.2026</div>
+      <div class="topbar-sub">Letzte Aktualisierung: 18.11.2026</div>
     </div>
   </div>
 </header>
@@ -328,6 +328,7 @@
     <input type="file" id="bk-file" accept=".json,application/json" class="hidden">
     <div id="bk-msg"></div>
   </div>
+  <p style="margin:18px 4px 0;text-align:center;font-size:.72rem;color:var(--muted);line-height:1.45">Anonyme Nutzungsstatistik (nur Zähler, ohne Namen und Inhalte).</p>
 </div>
 
 <script>
@@ -734,6 +735,43 @@ async function readMateriallisteFoto(file){
   return { r, ocr: true };
 }
 
+// ===== Anonyme Nutzungsstatistik: nur Zähler (Seite, Ablauf, Dauer, Gerät, Center) – keine Namen, keine Inhalte, keine IDs, keine Cookies =====
+// Läuft nur auf der Live-Seite (netlify.app). Abschalten für dieses Gerät: Seite mit ?nostats=1 öffnen (?nostats=0 = wieder an).
+const Stats = (() => {
+  const live = /netlify\.app$/.test(location.hostname);
+  try { const q = new URLSearchParams(location.search).get('nostats'); if (q === '1') localStorage.setItem('kdw_no_stats', '1'); else if (q === '0') localStorage.removeItem('kdw_no_stats'); } catch(e){}
+  let off = false; try { off = localStorage.getItem('kdw_no_stats') === '1'; } catch(e){}
+  const enabled = live && !off;
+  const device = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
+  let page = '', t0 = Date.now(), visSince = Date.now(); const done = {};
+  const bucket = ms => ms < 10000 ? '<10s' : ms < 30000 ? '10-30s' : ms < 60000 ? '30-60s' : ms < 180000 ? '1-3m' : ms < 600000 ? '3-10m' : '>10m';
+  const center = () => { try { return localStorage.getItem('kdw_last_center') || ''; } catch(e){ return ''; } };
+  const send = o => {
+    if (!enabled) return;
+    try {
+      const b = JSON.stringify(o);
+      if (!(navigator.sendBeacon && navigator.sendBeacon('/api/stats', new Blob([b], { type: 'application/json' })))) fetch('/api/stats', { method: 'POST', body: b, keepalive: true, headers: { 'Content-Type': 'application/json' } });
+    } catch(e){}
+  };
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden'){ const ms = Date.now() - visSince; if (page && ms >= 3000) send({ e: 'dur', p: page, t: bucket(ms), d: device, c: center() }); }
+    else visSince = Date.now();
+  });
+  return {
+    enabled,
+    // Seite betreten (vorherige Seite aus dem Tab-Verlauf -> "Wege"); name: menu | kdw | kunde | auto | bestand
+    pageview(name){
+      let from = ''; try { from = sessionStorage.getItem('kdw_prev') || ''; sessionStorage.setItem('kdw_prev', name); } catch(e){}
+      if (from === name) from = '';
+      page = name; t0 = Date.now(); visSince = Date.now();
+      send({ e: 'pv', p: name, f: from, c: center(), d: device });
+    },
+    // Ereignis zählen; withDur = Zeit seit Seitenbeginn mitsenden (Dauer bis zum Abschluss)
+    event(name, withDur){ if (page) send({ e: name, p: page, c: center(), d: device, t: withDur ? bucket(Date.now() - t0) : '' }); },
+    once(name){ if (!done[name]){ done[name] = 1; this.event(name); } }
+  };
+})();
+
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 async function paintBackupList(){
@@ -745,14 +783,15 @@ async function paintBackupList(){
   el.innerHTML = parts.length ? parts.join('') + '<div style="color:var(--muted);margin-top:4px">' + Autobestand.statusText() + '</div>' : '<div style="color:var(--muted)">Noch kein Auto-Bestand gespeichert.</div>';
 }
 const msg = (t, c) => { const m = $('bk-msg'); m.textContent = t; m.className = c || ''; };
-$('bk-export').addEventListener('click', () => { downloadBlob(Autobestand.backupBlob(), 'Auto-Bestand_Sicherung_' + todayISO() + '.json'); msg('Sicherung gespeichert.', 'ok'); });
+$('bk-export').addEventListener('click', () => { Stats.event('menu.backup_export'); downloadBlob(Autobestand.backupBlob(), 'Auto-Bestand_Sicherung_' + todayISO() + '.json'); msg('Sicherung gespeichert.', 'ok'); });
 $('bk-import').addEventListener('click', () => { $('bk-file').value = ''; $('bk-file').click(); });
 $('bk-file').addEventListener('change', async e => {
   const f = e.target.files[0]; if (!f) return;
   if (!confirm('Die Sicherung ersetzt den aktuellen Auto-Bestand der enthaltenen Lagerorte. Fortfahren?')) return;
-  try { const n = await Autobestand.restore(f); msg('Wiederhergestellt: ' + n + ' Lagerort(e).', 'ok'); paintBackupList(); }
+  try { const n = await Autobestand.restore(f); Stats.event('menu.backup_restore'); msg('Wiederhergestellt: ' + n + ' Lagerort(e).', 'ok'); paintBackupList(); }
   catch(err){ msg(err.message || 'Die Datei konnte nicht gelesen werden.', 'err'); }
 });
+Stats.pageview('menu');
 paintBackupList();
 if (!savedLagerort()) welcomeEinbauer(() => {});   // neuer Monteur: erst Center, dann Name (gilt dann für alle Seiten)
 </script>

@@ -586,7 +586,7 @@
     </div>
     <div class="topbar-left">
       <div class="topbar-title">Lely KDW</div>
-      <div class="topbar-sub">Letzte Aktualisierung: 17.11.2026</div>
+      <div class="topbar-sub">Letzte Aktualisierung: 18.11.2026</div>
     </div>
     <button type="button" class="topbar-settings" id="btn-settings" aria-label="Einstellungen">⚙</button>
   </div>
@@ -814,7 +814,8 @@
       <button type="button" class="modal-choice-btn" id="btn-open-addhome" style="width:100%;text-align:center;">📱 Zum Startbildschirm hinzufügen</button>
     </div>
     <button type="button" class="modal-cancel" id="btn-settings-close">Schließen</button>
-    <div style="margin-top:20px;text-align:center;font-size:11px;color:var(--muted);">Letzte Aktualisierung: 17.11.2026</div>
+    <div style="margin-top:20px;text-align:center;font-size:11px;color:var(--muted);">Anonyme Nutzungsstatistik (nur Zähler, ohne Namen und Inhalte).</div>
+    <div style="margin-top:8px;text-align:center;font-size:11px;color:var(--muted);">Letzte Aktualisierung: 18.11.2026</div>
     <div style="margin-top:8px;text-align:center;font-size:11px;color:var(--muted);">© 2026 Karel Baloun, k.baloun@eder-gmbh.de — Alle Rechte vorbehalten</div>
   </div>
 </div>
@@ -867,6 +868,43 @@ const IMAGES = ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgH
 const AUTHOR_EMAIL = "k.baloun@eder-gmbh.de";
 let MODE = null;   // 'kdw' | 'kunde' (wird beim Start gewählt)
 let KUNDE = { name: '', ort: '', nr: '', projekt: '' };
+
+// ===== Anonyme Nutzungsstatistik: nur Zähler (Seite, Ablauf, Dauer, Gerät, Center) – keine Namen, keine Inhalte, keine IDs, keine Cookies =====
+// Läuft nur auf der Live-Seite (netlify.app). Abschalten für dieses Gerät: Seite mit ?nostats=1 öffnen (?nostats=0 = wieder an).
+const Stats = (() => {
+  const live = /netlify\.app$/.test(location.hostname);
+  try { const q = new URLSearchParams(location.search).get('nostats'); if (q === '1') localStorage.setItem('kdw_no_stats', '1'); else if (q === '0') localStorage.removeItem('kdw_no_stats'); } catch(e){}
+  let off = false; try { off = localStorage.getItem('kdw_no_stats') === '1'; } catch(e){}
+  const enabled = live && !off;
+  const device = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
+  let page = '', t0 = Date.now(), visSince = Date.now(); const done = {};
+  const bucket = ms => ms < 10000 ? '<10s' : ms < 30000 ? '10-30s' : ms < 60000 ? '30-60s' : ms < 180000 ? '1-3m' : ms < 600000 ? '3-10m' : '>10m';
+  const center = () => { try { return localStorage.getItem('kdw_last_center') || ''; } catch(e){ return ''; } };
+  const send = o => {
+    if (!enabled) return;
+    try {
+      const b = JSON.stringify(o);
+      if (!(navigator.sendBeacon && navigator.sendBeacon('/api/stats', new Blob([b], { type: 'application/json' })))) fetch('/api/stats', { method: 'POST', body: b, keepalive: true, headers: { 'Content-Type': 'application/json' } });
+    } catch(e){}
+  };
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden'){ const ms = Date.now() - visSince; if (page && ms >= 3000) send({ e: 'dur', p: page, t: bucket(ms), d: device, c: center() }); }
+    else visSince = Date.now();
+  });
+  return {
+    enabled,
+    // Seite betreten (vorherige Seite aus dem Tab-Verlauf -> "Wege"); name: menu | kdw | kunde | auto | bestand
+    pageview(name){
+      let from = ''; try { from = sessionStorage.getItem('kdw_prev') || ''; sessionStorage.setItem('kdw_prev', name); } catch(e){}
+      if (from === name) from = '';
+      page = name; t0 = Date.now(); visSince = Date.now();
+      send({ e: 'pv', p: name, f: from, c: center(), d: device });
+    },
+    // Ereignis zählen; withDur = Zeit seit Seitenbeginn mitsenden (Dauer bis zum Abschluss)
+    event(name, withDur){ if (page) send({ e: name, p: page, c: center(), d: device, t: withDur ? bucket(Date.now() - t0) : '' }); },
+    once(name){ if (!done[name]){ done[name] = 1; this.event(name); } }
+  };
+})();
 
 // ---- Lely Center: Adresse + Empfänger je Center (kommt aus Zentren.xlsx) ----
 const NO_CENTER = { name: '', short: '', address: '', kdw: {}, kunde: {}, abbuchen: {}, extra: {} };
@@ -1399,6 +1437,7 @@ if (catNames.length > 1){
 
 function onQtyChange(e){
   const v = parseFloat(e.target.value);
+  if (v > 0) Stats.once((MODE === 'kunde' ? 'kunde' : 'kdw') + '.cart');
   e.target.classList.toggle('filled', v>0);
   const row = e.target.closest('.item-row');
   row.classList.toggle('zero-qty', !(v>0));
@@ -1493,6 +1532,8 @@ document.getElementById('search').addEventListener('input', e=>{
     }
   });
 
+  clearTimeout(window.__missT);   // Suche ohne Treffer: erst nach kurzer Pause zählen (nicht bei jedem Buchstaben); der Begriff wird nicht gesendet
+  if (q && !Object.keys(matchesByCategory).length) window.__missT = setTimeout(() => { if (q !== window.__lastMiss){ window.__lastMiss = q; Stats.event('search.miss'); } }, 1500);
   if (q && allowedCats().length > 1){
     const activeBtn = [...tabsWrap.querySelectorAll('.tab-btn')].find(b => b.classList.contains('active'));
     const activeCat = activeBtn ? activeBtn.dataset.category : null;
@@ -1601,6 +1642,7 @@ Bei Fragen wenden Sie sich bitte an den Autor der Anwendung: ${AUTHOR_EMAIL}
 `;
   const subject = `Bestellung Einbaumaterial - ${p.name} - ${datum}`;
   const mailto = mailtoUrl(c.kdw, subject, body);
+  Stats.event('kdw.sent_' + (deliverTo === 'wernberg' ? 'center' : 'home'), true);
   clearDraft();
   window.location.href = mailto;
 }
@@ -1617,6 +1659,7 @@ document.getElementById('btn-send').addEventListener('click', ()=>{
   }
   const pp = PEOPLE[sel.value];
   if (!needRecipient(MODE === 'kunde' ? centerOf(pp).kunde : centerOf(pp).kdw, pp)) return;
+  Stats.event((MODE === 'kunde' ? 'kunde' : 'kdw') + '.send_click');
   if (MODE === 'kunde'){
     if (!KUNDE.name || !KUNDE.ort){ openKundeModal(); return; }
     extraModal.classList.remove('hidden');
@@ -1737,6 +1780,7 @@ function renderKundeCard(){
 }
 function applyMode(mode){
   MODE = mode;
+  Stats.pageview(mode === 'kunde' ? 'kunde' : 'kdw');
   ITEMS.forEach(it => {   // Mengen der anderen Bestellart ausblenden; jede Bestellart hat ihren eigenen Entwurf
     it._qtyInput.value = '';
     it._qtyInput.classList.remove('filled');
@@ -1792,6 +1836,7 @@ document.getElementById('btn-kunde-ok').addEventListener('click', ()=>{
   kundeModal.classList.add('hidden');
   if (MODE === 'kunde'){ renderKundeCard(); }
   else { applyMode('kunde'); maybeShowNetlifyNotice(); }
+  Stats.event('kunde.dialog_ok');
 });
 // ---- Materialliste (PDF) lesen: Kunde, PLZ/Ort, Kundennr., Projektnr. werden im Browser ausgelesen (nichts wird hochgeladen) ----
 const PDFJS_BASE = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
@@ -1842,7 +1887,7 @@ function parseMaterialliste(items){
 }
 async function readMaterialliste(file){
   const status = document.getElementById('kunde-pdf-status');
-  const show = (msg, cls) => { status.textContent = msg; status.className = 'modal-status ' + cls; };
+  const show = (msg, cls) => { status.textContent = msg; status.className = 'modal-status ' + cls; if (cls === 'ok') Stats.event('kunde.pdf_ok'); else if (cls === 'err') Stats.event('kunde.pdf_fail'); };
   show('Materialliste wird gelesen ...', '');
   let items;
   try {
@@ -1906,7 +1951,7 @@ function parseOcrText(text){
 }
 async function readMateriallisteFoto(file){
   const status = document.getElementById('kunde-pdf-status');
-  const show = (msg, cls) => { status.textContent = msg; status.className = 'modal-status ' + cls; };
+  const show = (msg, cls) => { status.textContent = msg; status.className = 'modal-status ' + cls; if (cls === 'warn') Stats.event('kunde.foto_ok'); else if (cls === 'err') Stats.event('kunde.foto_fail'); };
   show('Foto wird gelesen ... (kann einen Moment dauern)', '');
   let text;
   try {
@@ -1968,11 +2013,13 @@ document.getElementById('btn-switch-mode').addEventListener('click', ()=>{
 document.getElementById('btn-extra-ok').addEventListener('click', ()=>{
   EXTRA_LINES = document.getElementById('extra-text').value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   if (EXTRA_LINES.length && !needRecipient(centerOf(PEOPLE[sel.value]).extra, PEOPLE[sel.value])){ EXTRA_LINES = []; return; }
+  Stats.event('kunde.extra_ok'); if (EXTRA_LINES.length) Stats.event('kunde.extra_used');
   extraModal.classList.add('hidden');
   shipModal.classList.remove('hidden');
 });
 document.getElementById('btn-extra-cancel').addEventListener('click', ()=> extraModal.classList.add('hidden'));
 document.getElementById('btn-extra-send').addEventListener('click', ()=>{
+  Stats.event('kunde.extra_mail');
   const p = PEOPLE[sel.value];
   const datum = formatDateDE(dateInput.value);
   let body = `Hallo,\n\nfolgende Artikel fehlen und stehen nicht in der Liste:\n\n` + EXTRA_LINES.map(l => `- ${l}`).join('\n') + '\n';
@@ -2038,6 +2085,7 @@ Bei Fragen wenden Sie sich bitte an den Autor der Anwendung: ${AUTHOR_EMAIL}
 `;
   const subject = `${versand === 'express' ? 'EXPRESS - ' : ''}Material Kunde - ${KUNDE.name}, ${KUNDE.ort} - ${datum}`;
   const mailto = mailtoUrl(c.kunde, subject, body);
+  Stats.event('kunde.sent_' + versand, true);
   clearDraft();
   window.location.href = mailto;
   if (EXTRA_LINES.length) extraSendModal.classList.remove('hidden');   // zweite E-Mail (ein Klick = eine E-Mail)

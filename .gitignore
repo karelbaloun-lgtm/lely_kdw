@@ -7,6 +7,8 @@
 !bestand/index.html
 !auto/
 !auto/index.html
+!statistik/
+!statistik/index.html
 !package.json
 !netlify.toml
 !netlify/

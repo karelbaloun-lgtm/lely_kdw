@@ -830,6 +830,43 @@ async function readMateriallisteFoto(file){
   return { r, ocr: true };
 }
 
+// ===== Anonyme Nutzungsstatistik: nur Zähler (Seite, Ablauf, Dauer, Gerät, Center) – keine Namen, keine Inhalte, keine IDs, keine Cookies =====
+// Läuft nur auf der Live-Seite (netlify.app). Abschalten für dieses Gerät: Seite mit ?nostats=1 öffnen (?nostats=0 = wieder an).
+const Stats = (() => {
+  const live = /netlify\.app$/.test(location.hostname);
+  try { const q = new URLSearchParams(location.search).get('nostats'); if (q === '1') localStorage.setItem('kdw_no_stats', '1'); else if (q === '0') localStorage.removeItem('kdw_no_stats'); } catch(e){}
+  let off = false; try { off = localStorage.getItem('kdw_no_stats') === '1'; } catch(e){}
+  const enabled = live && !off;
+  const device = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
+  let page = '', t0 = Date.now(), visSince = Date.now(); const done = {};
+  const bucket = ms => ms < 10000 ? '<10s' : ms < 30000 ? '10-30s' : ms < 60000 ? '30-60s' : ms < 180000 ? '1-3m' : ms < 600000 ? '3-10m' : '>10m';
+  const center = () => { try { return localStorage.getItem('kdw_last_center') || ''; } catch(e){ return ''; } };
+  const send = o => {
+    if (!enabled) return;
+    try {
+      const b = JSON.stringify(o);
+      if (!(navigator.sendBeacon && navigator.sendBeacon('/api/stats', new Blob([b], { type: 'application/json' })))) fetch('/api/stats', { method: 'POST', body: b, keepalive: true, headers: { 'Content-Type': 'application/json' } });
+    } catch(e){}
+  };
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden'){ const ms = Date.now() - visSince; if (page && ms >= 3000) send({ e: 'dur', p: page, t: bucket(ms), d: device, c: center() }); }
+    else visSince = Date.now();
+  });
+  return {
+    enabled,
+    // Seite betreten (vorherige Seite aus dem Tab-Verlauf -> "Wege"); name: menu | kdw | kunde | auto | bestand
+    pageview(name){
+      let from = ''; try { from = sessionStorage.getItem('kdw_prev') || ''; sessionStorage.setItem('kdw_prev', name); } catch(e){}
+      if (from === name) from = '';
+      page = name; t0 = Date.now(); visSince = Date.now();
+      send({ e: 'pv', p: name, f: from, c: center(), d: device });
+    },
+    // Ereignis zählen; withDur = Zeit seit Seitenbeginn mitsenden (Dauer bis zum Abschluss)
+    event(name, withDur){ if (page) send({ e: name, p: page, c: center(), d: device, t: withDur ? bucket(Date.now() - t0) : '' }); },
+    once(name){ if (!done[name]){ done[name] = 1; this.event(name); } }
+  };
+})();
+
 // ===== Katalogdaten (aus dem KDW-Katalog, nur LELY) =====
 const CATALOG = {"RMPA4X2BLAU": {"a": "RM PA4x2BLAU", "n": "Luftschlauch 4 mm", "g": "Schläuche + dazugehörige Verbinder", "i": 0}, "RMPA6X4BLAU": {"a": "RM PA6x4BLAU", "n": "Luftschlauch 6 mm", "g": "Schläuche + dazugehörige Verbinder", "i": 0}, "9113800656": {"a": "9.1138.0065.6", "n": "Druckluftschlauch 8mm blau", "g": "Schläuche + dazugehörige Verbinder", "i": 0}, "ROPA22X18": {"a": "RO PA22x18", "n": "Luftschlauch 22 mm", "g": "Schläuche + dazugehörige Verbinder", "i": 1}, "9113801522": {"a": "9.1138.0152.2", "n": "Luftschlauch 14 mm", "g": "Schläuche + dazugehörige Verbinder", "i": 1}, "9113801533": {"a": "9.1138.0153.3", "n": "Luftschlauch 10 mm", "g": "Schläuche + dazugehörige Verbinder", "i": 1}, "9106501260": {"a": "9.1065.0126.0", "n": "Schlauch grün 19 mm", "g": "Schläuche + dazugehörige Verbinder", "i": 2}, "9106501000": {"a": "9.1065.0100.0", "n": "Schlauch rot 19mm", "g": "Schläuche + dazugehörige Verbinder", "i": 3}, "9106501270": {"a": "9.1065.0127.0", "n": "Schlauch blau 19 mm", "g": "Schläuche + dazugehörige Verbinder", "i": 4}, "9106500936": {"a": "9.1065.0093.6", "n": "Wasserleitung rot 16 mm", "g": "Schläuche + dazugehörige Verbinder", "i": 3}, "9106500980": {"a": "9.1065.0098.0", "n": "Wasserleitung blau 16 mm", "g": "Schläuche + dazugehörige Verbinder", "i": 4}, "9106500970": {"a": "9.1065.0097.0", "n": "Wasserleitung grün 16 mm", "g": "Schläuche + dazugehörige Verbinder", "i": 2}, "9106500613": {"a": "9.1065.0061.3", "n": "Dippmittelschlauch", "g": "Schläuche + dazugehörige Verbinder", "i": 5}, "9118501603": {"a": "9.1185.0160.3", "n": "Spiral-Vakuumschlauch 40x5", "g": "Schläuche + dazugehörige Verbinder", "i": 6}, "9118503515": {"a": "9.1185.0351.5", "n": "Schlauch UNISIL 16x4,8 Silicon (ROT)", "g": "Schläuche + dazugehörige Verbinder", "i": 7}, "9118500995": {"a": "9.1185.0099.5", "n": "Milchleitung (PVC)", "g": "Schläuche + dazugehörige Verbinder", "i": null}, "9106500646": {"a": "9.1065.0064.6", "n": "Schlauch 22x3,5 Silicon (ROT)", "g": "Schläuche + dazugehörige Verbinder", "i": 8}, "9118501006": {"a": "9.1185.0100.6", "n": "Isolierung Milchleitung Normal (2m)", "g": "Schläuche + dazugehörige Verbinder", "i": 9}, "LD221420101935": {"a": "LD221420101935", "n": "Isol. groß 35 mm (1m/Stück)", "g": "Schläuche + dazugehörige Verbinder", "i": 10}, "FE053543": {"a": "FE053543", "n": "Flexibler Schrumpfschlauch Box 6,4mm grün-gelb", "g": "Schläuche + dazugehörige Verbinder", "i": 11}, "FE224457": {"a": "FE224457", "n": "Gitterrinne 60x100 (3m)", "g": "Gitterrinnen + Zubehör", "i": 12}, "FE224632": {"a": "FE224632", "n": "Gitterrinne 60x300 (3m)", "g": "Gitterrinnen + Zubehör", "i": 12}, "FE224633": {"a": "FE224633", "n": "Gitterrinne 60x400 (3m)", "g": "Gitterrinnen + Zubehör", "i": 12}, "FE045973": {"a": "FE045973", "n": "Ausleger für Gitterr.(100mm) pro mtr./1 Stk.", "g": "Gitterrinnen + Zubehör", "i": 13}, "FE045975": {"a": "FE045975", "n": "Ausleger für Gitterr. (300mm) pro mtr./1 Stk.", "g": "Gitterrinnen + Zubehör", "i": 13}, "FE045976": {"a": "FE045976", "n": "Ausleger für Gitterr. (400mm) pro mtr./1 Stk.", "g": "Gitterrinnen + Zubehör", "i": 13}, "FE045978": {"a": "FE045978", "n": "Ausleger für Gitterr. (600mm) pro mtr./1 Stk.", "g": "Gitterrinnen + Zubehör", "i": 13}, "QU2641540": {"a": "QU2641540", "n": "Ausleger für Gitterr. (800mm) pro mtr./1 Stk.", "g": "Gitterrinnen + Zubehör", "i": 13}, "FE225082": {"a": "FE225082", "n": "Schrauben/Kepsmutter für Gitterr. Platten (Pack. 100 Stk)", "g": "Gitterrinnen + Zubehör", "i": 14}, "FE225081": {"a": "FE225081", "n": "Platten für Gitterrinne", "g": "Gitterrinnen + Zubehör", "i": 15}, "FE025922": {"a": "FE025922", "n": "Patchkabel 0,5 m (mit Schirmung)", "g": "Kabel", "i": 16}, "FE025923": {"a": "FE025923", "n": "Patchkabel 1,0 m (mit Schirmung)", "g": "Kabel", "i": 16}, "FE025926": {"a": "FE025926", "n": "Patchkabel 3,0 m (mit Schirmung)", "g": "Kabel", "i": 16}, "FE132203": {"a": "FE132203", "n": "Steuerleitung: 7x0,75mm² (CRS → Wedholms+Fremdtank)", "g": "Kabel", "i": 17}, "FE135472": {"a": "FE135472", "n": "Steuerleitung: 3x1,5mm² (CRS → Antennebox)", "g": "Kabel", "i": 18}, "FE132129": {"a": "FE132129", "n": "Steuerleitung: 2x1mm² (CRS → Kompressor)", "g": "Kabel", "i": 19}, "FE844746": {"a": "FE844746", "n": "Stromkabel 3x2,5mm² mit Schirmung (CU → RU)", "g": "Kabel", "i": 20}, "FE025406": {"a": "FE025406", "n": "Datenkabel CAT 7 (250m)", "g": "Kabel", "i": 21}, "9119004520": {"a": "9.1190.0452.0", "n": "Netzwerkkoppler", "g": "Kabel", "i": 22}, "9119001050": {"a": "9.1190.0105.0", "n": "Patchkabel für Netzwerkkoppler (ohne Schirmung)", "g": "Kabel", "i": null}, "9119006580": {"a": "9.1190.0658.0", "n": "Kabel für Ventilüberwachung (10 Meter)", "g": "Kabel", "i": null}, "FE786161": {"a": "FE786161", "n": "E-DATmodul REG8", "g": "Elektrozubehör", "i": 23}, "FE780162": {"a": "FE780162", "n": "RJ45-Stecker", "g": "Elektrozubehör", "i": 24}, "FE845014": {"a": "FE845014", "n": "Datenstecker Cat6 gewinkelt", "g": "Elektrozubehör", "i": 25}, "FE720655": {"a": "FE720655", "n": "5-polig CEE Stecker 16A", "g": "Elektrozubehör", "i": 26}, "FE050470": {"a": "FE050470", "n": "Kabelkanal 110x60 (Lichtgrau)", "g": "Elektrozubehör", "i": 27}, "FE872026": {"a": "FE872026", "n": "WAGO Verbindungsklemmen 2polig", "g": "Elektrozubehör", "i": 28}, "FE872027": {"a": "FE872027", "n": "WAGO Verbindungsklemmen 3polig", "g": "Elektrozubehör", "i": 29}, "FE872028": {"a": "FE872028", "n": "WAGO Verbindungsklemmen 5polig", "g": "Elektrozubehör", "i": 30}, "9118610660": {"a": "9.1186.1066.0", "n": "Connector SACC", "g": "Elektrozubehör", "i": 31}, "9118610670": {"a": "9.1186.1067.0", "n": "M 12 Stecker für Automatiktor Anschluss", "g": "Elektrozubehör", "i": 32}, "FE803592": {"a": "FE803592", "n": "PVC-Rohr (Typrohr) M25", "g": "Elektrozubehör", "i": 33}, "FE050420": {"a": "FE050420", "n": "Typrohrschellen M25", "g": "Elektrozubehör", "i": 34}, "00LDMK11": {"a": "00.LDMK11", "n": "Molykote Siliconfett 100g", "g": "Elektrozubehör", "i": 35}, "9106600542": {"a": "9.1066.0054.2", "n": "Schlauchschellen 10.5-12.0mm (Dippmittelleitung)", "g": "Schellen", "i": 36}, "9106600203": {"a": "9.1066.0020.3", "n": "Schlauchschellen 16-27mm (PVC Milchleitung)", "g": "Schellen", "i": 37}, "9106600214": {"a": "9.1066.0021.4", "n": "Schlauchschellen 25-40mm (Milchfilterschlauch)", "g": "Schellen", "i": 38}, "9106600236": {"a": "9.1066.0023.6", "n": "Schlauchschellen 32-50mm (Vakuumleitung)", "g": "Schellen", "i": 39}, "9106601200": {"a": "9.1066.0120.0", "n": "Schlauchschellen 20-32mm Edelstahl (f. 19mm Wasserschlauch)", "g": "Schellen", "i": 40}, "9113709372": {"a": "9.1137.0937.2", "n": "Milchleitungsschellen (Schwarz)", "g": "Schellen", "i": 41}, "RO086266": {"a": "RO086266", "n": "BIS Schelle BIFIX 1301 25 - 28 mm", "g": "Schellen", "i": 42}, "LD086267": {"a": "LD086267", "n": "BIS Schelle BIFIX 31 - 35mm Edelstahl", "g": "Schellen", "i": 42}, "9113000283": {"a": "9.1130.0028.3", "n": "Dichtung Rohrkühler", "g": "Milchleitung & Rohrkühler", "i": null}, "9106600656": {"a": "9.1066.0065.6", "n": "Tri - Clamp Schelle Rohrkühler", "g": "Milchleitung & Rohrkühler", "i": 43}, "5100458530": {"a": "5.1004.5853.0", "n": "Milchleitungsanschluss Rohrkühler gerade", "g": "Milchleitung & Rohrkühler", "i": null}, "5108007310": {"a": "5.1080.0731.0", "n": "90° Bogen Milchleitungsanschluss Rohrkühler", "g": "Milchleitung & Rohrkühler", "i": 44}, "400361": {"a": "L400361", "n": "Y- Verbindung für Milchleitung", "g": "Milchleitung & Rohrkühler", "i": null}, "5100372300": {"a": "5.1003.7230.0", "n": "T-Stück Milchleitung (geschweißt)", "g": "Milchleitung & Rohrkühler", "i": 45}, "5100266870": {"a": "5.1002.6687.0", "n": "Milchleitungsverbinder PVC", "g": "Milchleitung & Rohrkühler", "i": 46}, "T0558782": {"a": "T0558782", "n": "Verbinder Wasserschl. 16mm", "g": "Wasserleitung + Verbinder", "i": 47}, "5100463910": {"a": "5.1004.6391.0", "n": "16/19 Wasseranschlüsse", "g": "Wasserleitung + Verbinder", "i": 47}, "5100474850": {"a": "5.1004.7485.0", "n": "Verbinder 19mm Wasserschlauch", "g": "Wasserleitung + Verbinder", "i": 47}, "BD7410081": {"a": "BD7410081", "n": "Y-Stück 19mm Wasserleitung (Boetech)", "g": "Wasserleitung + Verbinder", "i": null}, "5100554520": {"a": "5.1005.5452.0", "n": "Neues Y-Stück geschweißt, 19mm (Heisswasserltg.)", "g": "Wasserleitung + Verbinder", "i": null}, "5100473600": {"a": "5.1004.7360.0", "n": "Y-Stück Wasserleitung, 19mm (Kaltwasserltg.)", "g": "Wasserleitung + Verbinder", "i": null}, "5100537400": {"a": "5.1005.3740.0", "n": "Connection Set 19mm CU to 1 RU", "g": "Wasserleitung + Verbinder", "i": 48}, "5100537410": {"a": "5.1005.3741.0", "n": "Connection Set 19mm CU to 2 RU", "g": "Wasserleitung + Verbinder", "i": 49}, "9113812370": {"a": "9.1138.1237.0", "n": "22 mm T-Stück Luftanschluss", "g": "Druckluft-Zubehör", "i": null}, "RMWE12ESE": {"a": "RMWE12ESE", "n": "90' Einschraubwinkel 1/2\"", "g": "Druckluft-Zubehör", "i": 50}, "RMD22L": {"a": "RMD22L", "n": "Schneidring 22", "g": "Druckluft-Zubehör", "i": 51}, "9113801290": {"a": "9.1138.0129.0", "n": "Druckluftbegrenzungsventil CRS", "g": "Druckluft-Zubehör", "i": null}, "BB576367": {"a": "BB576367", "n": "Spaltenanker (normal)", "g": "Spaltenanker", "i": null}, "BD300302": {"a": "BD300302", "n": "Spaltenanker (für ungerade Spalten)", "g": "Spaltenanker", "i": null}, "ROIQST40": {"a": "ROIQST40", "n": "T-Stück 4-4-4", "g": "Festo", "i": 52}, "ROIQSG40": {"a": "ROIQSG40", "n": "Verbinder gerade 4", "g": "Festo", "i": 53}, "ROIQSG40H60": {"a": "ROIQSG40H60", "n": "Reduzierung 6 auf 4", "g": "Festo", "i": 54}, "ROIQSG60H40": {"a": "ROIQSG60H40", "n": "Reduzierung 4 auf 6", "g": "Festo", "i": 54}, "ROIQST60": {"a": "ROIQST60", "n": "T-Stück 6-6-6", "g": "Festo", "i": 52}, "ROIQSG60": {"a": "ROIQSG60", "n": "Verbinder gerade 6", "g": "Festo", "i": 53}, "ROIQSL186": {"a": "ROIQSL186", "n": "Winkelstück 6 für Ventilblock (altes CRS +)", "g": "Festo", "i": 55}, "RMIQSDRV60": {"a": "RMIQSDRV60", "n": "Drosselrückschlagventil 6", "g": "Festo", "i": 56}, "ROIQSY60": {"a": "ROIQSY60", "n": "Y-Stück 6", "g": "Festo", "i": 57}, "ROIQSG80": {"a": "ROIQSG80", "n": "Verbinder gerade 8", "g": "Festo", "i": 53}, "ROIQSG100": {"a": "ROIQSG100", "n": "Verbinder gerade 10", "g": "Festo", "i": 58}, "ROIQST100": {"a": "ROIQST100", "n": "T-Stück 10-10-10", "g": "Festo", "i": 52}, "RMIQST10060100": {"a": "RMIQST10060100", "n": "T-Stück 10-6-10", "g": "Festo", "i": 59}, "RMIQSG10060": {"a": "RMIQSG10060", "n": "Reduzierung 10 auf 6", "g": "Festo", "i": 60}, "ROIQSY100": {"a": "ROIQSY100", "n": "Y-Stück 10", "g": "Festo", "i": 57}, "RMIQSG1210G": {"a": "RMIQSG1210G", "n": "10er Einschraubung auf Halbzoll", "g": "Festo", "i": null}, "RMHIQS100": {"a": "RMHIQS100", "n": "Rückschlagventile für Flüssigfütterung", "g": "Festo", "i": 61}, "ROIQSG140": {"a": "ROIQSG140", "n": "Verbinder gerade 14", "g": "Festo", "i": 53}, "RMIQST140": {"a": "RMIQST140", "n": "T-Stück 14-14-14", "g": "Festo", "i": 52}, "ROIQSG1214": {"a": "ROIQSG1214", "n": "14er Einschraubung auf Halbzoll", "g": "Festo", "i": null}, "9113812350": {"a": "9.1138.1235.0", "n": "22er Winkel-Luftanschluss (1x Pro Doppelanlage)", "g": "Festo", "i": 62}, "9113810540": {"a": "9.1138.1054.0", "n": "Reducer 14-10mm", "g": "Festo", "i": null}, "RMIQST220": {"a": "RMIQST220", "n": "T-Stück 22-22-22", "g": "Festo", "i": 63}, "ROIQSG220": {"a": "ROIQSG220", "n": "Gerader Steckanschluss / Verbinder 22mm", "g": "Festo", "i": 64}, "ROIQSL220": {"a": "ROIQSL220", "n": "Winkel Steckanschluss 22mm", "g": "Festo", "i": 65}, "5100550360": {"a": "5.1005.5036.0", "n": "Verbinder 22-14 mm gerade", "g": "Festo", "i": null}, "9113803223": {"a": "9.1138.0322.3", "n": "Steck-Schnellkupplung 4mm High", "g": "Sonstige Kupplungen", "i": null}, "9113803234": {"a": "9.1138.0323.4", "n": "Steck-Schnellkupplung 4mm Low L", "g": "Sonstige Kupplungen", "i": null}, "9113803245": {"a": "9.1138.0324.5", "n": "Steck-Schnellkupplung 6mm High", "g": "Sonstige Kupplungen", "i": null}, "9113803256": {"a": "9.1138.0325.6", "n": "Steck-Schnellkupplung 6mm", "g": "Sonstige Kupplungen", "i": null}, "5100455150": {"a": "5.1004.5515.0", "n": "Plate", "g": "I-Flow", "i": 66}, "9105704430": {"a": "9.1057.0443.0", "n": "Roboterdach schraube", "g": "I-Flow", "i": 67}, "9111304774": {"a": "9.1113.0477.4", "n": "M12x20 DIN933-A2-70 s/s", "g": "I-Flow", "i": null}, "9111305234": {"a": "9.1113.0523.4", "n": "M10x20 DIN933-A2-2 s/s", "g": "I-Flow", "i": null}, "9111304752": {"a": "9.1113.0475.2", "n": "M8x60 DIN931-A2-70 s/s", "g": "I-Flow", "i": 68}, "9105801040": {"a": "9.1058.0104.0", "n": "M10 x 70 DIN603 A2-2 S/S", "g": "I-Flow", "i": null}, "9105801000": {"a": "9.1058.0100.0", "n": "M10x65 DIN603-A2-2 s/s", "g": "I-Flow", "i": 69}, "9105801080": {"a": "9.1058.0108.0", "n": "M16 x 150 (Eingangstor)", "g": "I-Flow", "i": 70}, "9103000344": {"a": "9.1030.0034.4", "n": "Mutter M16", "g": "I-Flow", "i": 71}, "9105701281": {"a": "9.1057.0128.1", "n": "M16 x 50 (Zylinder)", "g": "I-Flow", "i": 72}, "6200112240": {"a": "L6200112240", "n": "Cable SAC-5P-M12MS", "g": "I-Flow", "i": null}, "6200112100": {"a": "L6200112100", "n": "Cable SAC-5P-MS/15", "g": "I-Flow", "i": null}, "9113812390": {"a": "L9113812390", "n": "Clip 22mm weiß", "g": "I-Flow", "i": null}, "9113801894": {"a": "L9113801894", "n": "Drosselventil 6-6", "g": "I-Flow", "i": null}, "5100417270": {"a": "L5100417270", "n": "Verschraubung 19mm", "g": "I-Flow", "i": null}, "ROIQSL60": {"a": "ROIQSL60", "n": "Winkelstück 6", "g": "I-Flow", "i": null}, "FE184362": {"a": "FE184362", "n": "Flexibles Isolierrohr FBY-EL-F", "g": "Milk for Use", "i": 73}, "5100166590": {"a": "5.1001.6659.0", "n": "Kupplungsstück", "g": "Milk for Use", "i": 74}, "5100560990": {"a": "5.1005.6099.0", "n": "CAN-Kabel 7m (Schwarz)", "g": "Milk for Use", "i": 75}, "5100558600": {"a": "5.1005.5860.0", "n": "CAN-Kabel 10m (Violette)", "g": "Milk for Use", "i": 76}, "5100558660": {"a": "5.1005.5866.0", "n": "CAN-Kabel 15m (Violette)", "g": "Milk for Use", "i": 76}, "9113810720": {"a": "9.1138.1072.0", "n": "Luftventil", "g": "Sep+Texastore", "i": 77}, "9103800240": {"a": "9.1038.0024.0", "n": "Gabel", "g": "Sep+Texastore", "i": 78}, "9103800236": {"a": "9.1038.0023.6", "n": "Gabel", "g": "Sep+Texastore", "i": 79}, "9111900570": {"a": "9.1119.0057.0", "n": "Sicherungsring", "g": "Sep+Texastore", "i": 80}, "0387000010": {"a": "0387000010", "n": "Sperrzahnmutter M10", "g": "Sep+Texastore", "i": 81}, "02261080": {"a": "022610 80", "n": "Flachrundschraube M10x80", "g": "Sep+Texastore", "i": 82}, "5972300002": {"a": "5.9723.0000.2", "n": "Texastorflügel", "g": "Sep+Texastore", "i": null}, "LD110000": {"a": "LD110000", "n": "Kreuzschellen (pro Sep.tor zwei Stück)", "g": "Sep+Texastore", "i": null}, "5100532440": {"a": "5.1005.3244.0", "n": "Euterpflege Set (Dippmittelpumpe - set)", "g": "Zentraleinheit (CU)", "i": 83}, "5100418020": {"a": "5.1004.1802.0", "n": "Dippmittelverbinder gerade", "g": "Zentraleinheit (CU)", "i": 84}, "5100418050": {"a": "5.1004.1805.0", "n": "Dippmittel Y-Stück", "g": "Zentraleinheit (CU)", "i": 85}, "5100552300": {"a": "5.1005.5230.0", "n": "Pumpe", "g": "Zentraleinheit (CU)", "i": 86}, "5100409700": {"a": "5.1004.0970.0", "n": "Kappe", "g": "Zentraleinheit (CU)", "i": 87}};      // { normierteNr: {a: Artikelnummer, n: Name, g: Gruppe, i: Bildindex|null} }
 const GROUP_ORDER = ["Schläuche + dazugehörige Verbinder", "Gitterrinnen + Zubehör", "Kabel", "Elektrozubehör", "Schellen", "Milchleitung & Rohrkühler", "Wasserleitung + Verbinder", "Druckluft-Zubehör", "Spaltenanker", "Festo", "Sonstige Kupplungen", "I-Flow", "Milk for Use", "Sep+Texastore", "Zentraleinheit (CU)"];
@@ -885,7 +922,7 @@ async function loadForPerson(){
   $('sub').textContent = LO ? 'Lager ' + LO : 'Auto-Bestand';
   if (!LO) return;
   stock = await Autobestand.load(LO);
-  if (!stock || !Object.keys(stock.items).length){ $('nostock').classList.remove('hidden'); return; }
+  if (!stock || !Object.keys(stock.items).length){ Stats.once('auto.nostock'); $('nostock').classList.remove('hidden'); return; }
   loadDraft();
   $('app').classList.remove('hidden'); $('sendbar').classList.remove('hidden');
   buildList(); renderKunde(); updateSum();
@@ -917,7 +954,7 @@ function buildList(){
       if (sel[key] != null) input.value = sel[key];
       const rd = { key, it, cat, name, row, input, diff };
       const refresh = () => { paint(rd); updateSum(); };
-      input.addEventListener('input', () => { sel[key] = input.value; saveDraft(); refresh(); });
+      input.addEventListener('input', () => { sel[key] = input.value; if (parseVal(input.value) > 0) Stats.once('auto.cart'); saveDraft(); refresh(); });
       row.querySelector('.soll').addEventListener('click', () => { if (it.q > 0){ input.value = fmt(it.q); sel[key] = input.value; saveDraft(); refresh(); } });
       if (cat && cat.i != null) row.querySelector('.item-thumb').addEventListener('click', () => openLightbox(IMAGES[cat.i], name));
       paint(rd); rows.push(rd); body.appendChild(row);
@@ -938,13 +975,18 @@ function updateSum(){
   $('sum').innerHTML = c.length ? (c.length + ' Artikel ausgewählt<span>' + (over ? '⚠ ' + over + ' mit mehr als im Auto' : (KUNDE.name ? 'für ' + esc(KUNDE.name) : 'Kunde noch nicht eingegeben')) + '</span>')
                                 : 'Noch nichts ausgewählt<span>Menge bei „Entnahme“ eintragen</span>';
 }
+let lastMiss = '';
 $('search').addEventListener('input', e => {
   const tokens = foldText(e.target.value.trim()).split(/\s+/).filter(Boolean);
+  let total = 0;
   document.querySelectorAll('details.group').forEach(det => {
     let any = false;
     det.querySelectorAll('.item-row').forEach(row => { const m = tokens.every(t => row.dataset.search.includes(t)); row.style.display = m ? '' : 'none'; if (m) any = true; });
-    det.classList.toggle('hidden', !any); if (tokens.length && any) det.open = true;
+    det.classList.toggle('hidden', !any); if (tokens.length && any){ det.open = true; total++; }
   });
+  const q = tokens.join(' ');
+  clearTimeout(window.__missT);   // erst nach kurzer Pause zählen; der Suchbegriff wird nicht gesendet
+  if (tokens.length && !total) window.__missT = setTimeout(() => { if (q !== lastMiss){ lastMiss = q; Stats.event('search.miss'); } }, 1500);
 });
 
 // ===== Kunde =====
@@ -975,14 +1017,16 @@ function applyRead(res){
   $('k-error').classList.add('hidden');
   show(res.ocr ? 'Aus dem Foto gelesen – bitte ALLE Angaben (besonders Nummern) prüfen!' : (res.r.name && res.r.ort ? 'Kundendaten übernommen. Bitte kurz prüfen.' : 'Kundendaten teilweise übernommen. Bitte ergänzen (* = Pflichtfeld).'), res.ocr ? 'warn' : (res.r.name && res.r.ort ? 'ok' : 'err'));
 }
-async function runRead(file, fn, msg){
+async function runRead(file, fn, msg, kind){
   const st = $('k-status'); st.textContent = msg; st.className = 'mstatus';
-  applyRead(await fn(file));
+  const res = await fn(file);
+  Stats.event('auto.' + kind + (res.error ? '_fail' : '_ok'));
+  applyRead(res);
 }
 $('btn-k-pdf').addEventListener('click', () => $('k-pdf-input').click());
-$('k-pdf-input').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) runRead(f, readMateriallisteFile, 'Materialliste wird gelesen ...'); });
+$('k-pdf-input').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) runRead(f, readMateriallisteFile, 'Materialliste wird gelesen ...', 'pdf'); });
 $('btn-k-foto').addEventListener('click', () => $('k-foto-input').click());
-$('k-foto-input').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) runRead(f, readMateriallisteFoto, 'Foto wird gelesen ... (kann einen Moment dauern)'); });
+$('k-foto-input').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) runRead(f, readMateriallisteFoto, 'Foto wird gelesen ... (kann einen Moment dauern)', 'foto'); });
 
 // ===== Abbuchen + Export =====
 const fModal = $('finish-modal');
@@ -1007,7 +1051,7 @@ $('btn-finish').addEventListener('click', () => {
   $('btn-f-share').classList.toggle('hidden', !sh);
   $('f-hint').textContent = sh ? 'Beim Teilen im Menü „Outlook“/„E-Mail“ wählen – die Datei ist schon angehängt. Den Empfänger bitte selbst eintragen (oben kopieren).'
                                : 'Dieses Gerät kann Dateien nicht direkt teilen. Die Datei wird heruntergeladen; danach bitte selbst per E-Mail anhängen.';
-  paintSeg(); $('f-before').classList.remove('hidden'); $('f-after').classList.add('hidden'); fModal.classList.remove('hidden');
+  Stats.event('auto.finish_open'); paintSeg(); $('f-before').classList.remove('hidden'); $('f-after').classList.add('hidden'); fModal.classList.remove('hidden');
 });
 $('btn-f-cancel').addEventListener('click', () => fModal.classList.add('hidden'));
 $('f-rcpt').addEventListener('click', async e => {
@@ -1050,6 +1094,7 @@ function bookWithdrawal(c){
     stock.log = stock.log || []; stock.log.push({ t: Date.now(), k: 'abbuchen', a: it.a, q: take, c: KUNDE.name + ', ' + KUNDE.ort });
   });
   Autobestand.save(LO, stock);
+  Stats.event('auto.booked.' + fmtChoice, true);
   return out;
 }
 function finishDone(){
@@ -1063,11 +1108,13 @@ function finishDone(){
 $('btn-f-share').addEventListener('click', async () => {
   lastExport = bookWithdrawal(chosen());
   const res = await shareFile(lastExport.file, lastExport.subject, lastExport.text);
+  Stats.event('auto.share_' + res);
   if (res === 'unsupported') downloadBlob(lastExport.file, lastExport.file.name);
   finishDone();
 });
 $('btn-f-download').addEventListener('click', () => {
   lastExport = bookWithdrawal(chosen());
+  Stats.event('auto.download');
   downloadBlob(lastExport.file, lastExport.file.name);
   finishDone();
 });
@@ -1088,6 +1135,7 @@ lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
 // ===== Start =====
+Stats.pageview('auto');
 if (savedLagerort()) loadForPerson();
 else welcomeEinbauer(lo => { selEl.value = lo; loadForPerson(); });
 </script>

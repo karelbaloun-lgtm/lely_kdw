@@ -46,11 +46,15 @@
 @keyframes sp-pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes sp-draw{to{stroke-dashoffset:0}}
 @keyframes sp-fade{to{opacity:1}}
-#splash .sp-bar{position:relative;width:132px;height:4px;border-radius:4px;background:rgba(120,130,150,.22);overflow:hidden;}
-#splash .sp-bar i{position:absolute;top:0;bottom:0;width:44%;border-radius:4px;background:linear-gradient(90deg,transparent,#C8102E,transparent);animation:sp-slide 1.25s ease-in-out infinite;}
-@keyframes sp-slide{from{left:-45%}to{left:101%}}
+#splash .sp-kitt{display:flex;gap:4px;align-items:center;}
+#splash .sp-kitt i{position:relative;display:block;width:10px;height:8px;border-radius:3px;background:rgba(200,16,46,.18);}
+#splash .sp-kitt i::before,#splash .sp-kitt i::after{content:"";position:absolute;inset:0;border-radius:3px;background:#ff2f4a;box-shadow:0 0 9px 2px rgba(255,47,74,.75);opacity:0;animation:sp-kitt 1.6s linear infinite;}
+#splash .sp-kitt i::before{animation-delay:calc(var(--i) * .08s);}
+#splash .sp-kitt i::after{animation-delay:calc(.8s + (10 - var(--i)) * .08s);}
+@keyframes sp-kitt{0%{opacity:1}8%{opacity:.7}20%{opacity:.25}32%{opacity:0}100%{opacity:0}}
 @media (prefers-reduced-motion: reduce){
-  #splash .sp-orb,#splash .sp-card,#splash .sp-box,#splash .sp-bar i{animation:none !important;}
+  #splash .sp-orb,#splash .sp-card,#splash .sp-box,#splash .sp-kitt i::before,#splash .sp-kitt i::after{animation:none !important;}
+  #splash .sp-kitt i:nth-child(6)::before{opacity:.85;}
   #splash .sp-ring{animation:none;stroke-dashoffset:0;} #splash .sp-word{animation:none;opacity:1;}
 }
 @media print{#splash{display:none !important}}
@@ -807,7 +811,7 @@
       <g transform="translate(110,70) skewX(-10) translate(-110,-70)"><text class="sp-word" x="110" y="88">LELY</text></g>
     </svg>
   </div>
-  <div class="sp-bar"><i></i></div>
+  <div class="sp-kitt" aria-hidden="true"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i><i style="--i:9"></i><i style="--i:10"></i></div>
 </div>
 
 <header class="topbar">

@@ -287,6 +287,34 @@
   .sec p{margin:0 0 10px;font-size:.8rem;color:var(--muted);line-height:1.45;}
   .sec .btns{display:flex;gap:8px;flex-wrap:wrap;}
   .sec .btns button{flex:1 1 150px;}
+  .topbar-gear{flex:0 0 auto;width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .topbar-gear:active{background:rgba(255,255,255,.28);}
+  .set-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:250;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .set-box{background:var(--card);color:var(--ink);border-radius:14px;max-width:420px;width:100%;padding:20px 20px 16px;box-shadow:0 8px 30px rgba(0,0,0,.3);max-height:calc(100vh - 40px);overflow-y:auto;}
+  .set-box h3.t{margin:0 0 4px;font-size:1.1rem;}
+  .set-box .sec{margin-top:14px;padding:12px 14px;border-radius:12px;}
+  .set-box .full{display:block;width:100%;text-align:center;text-decoration:none;box-sizing:border-box;}
+  .set-box .who{font-weight:700;margin-bottom:8px;}
+  .set-close{margin-top:14px;width:100%;padding:9px;border:none;background:transparent;color:var(--muted);font-size:.85rem;cursor:pointer;text-decoration:underline;font-family:inherit;}
+  /* --- Startseite: Begrüßung, Gruppen, große Kacheln (mobil zuerst) --- */
+  .wrap{padding-bottom:calc(28px + env(safe-area-inset-bottom));}
+  .hello{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 2px 2px;}
+  .hello-t{font-size:1.35rem;font-weight:800;line-height:1.15;letter-spacing:-.01em;}
+  .hello-s{font-size:.88rem;color:var(--muted);margin-top:3px;}
+  .chip-center{flex:0 0 auto;border:1.5px solid var(--border);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 13px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;max-width:48%;}
+  .chip-center span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .chip-center i{font-style:normal;color:var(--muted);font-size:.7rem;}
+  .glabel{margin:22px 4px 8px;font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);}
+  .tiles{margin-top:0;gap:10px;grid-template-columns:1fr;}
+  @media (min-width:700px){ .tiles{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));} }
+  a.tile{min-height:84px;padding:14px 14px 14px 14px;gap:14px;border-radius:16px;-webkit-tap-highlight-color:transparent;}
+  a.tile:active{transform:scale(.985);}
+  .tile-ico{width:54px;height:54px;border-radius:16px;font-size:1.65rem;}
+  .tile.t-auto .tile-ico{background:linear-gradient(145deg,#4a5260,#262b33);box-shadow:0 4px 14px rgba(30,35,45,.35);}
+  .tile-title{font-size:1.02rem;font-weight:800;line-height:1.2;text-wrap:balance;}
+  .tile-sub{font-size:.8rem;line-height:1.35;}
+  .tile-go{font-size:1.5rem;color:var(--lely-red);opacity:.75;}
+  .foot2{margin:26px 6px 0;text-align:center;font-size:.72rem;color:var(--muted);line-height:1.6;}
   #bk-list{font-size:.8rem;margin:0 0 10px;color:var(--ink);}
   #bk-list div{padding:2px 0;}
   #bk-msg{font-size:.82rem;margin-top:8px;font-weight:700;}
@@ -304,31 +332,59 @@
     </svg>
     <div class="topbar-left">
       <div class="topbar-title">Lely KDW</div>
-      <div class="topbar-sub">Letzte Aktualisierung: 18.11.2026</div>
+      <div class="topbar-sub">Bestellungen · Auto-Bestand</div>
     </div>
+    <button type="button" class="topbar-gear" id="btn-gear" aria-label="Einstellungen">⚙</button>
   </div>
 </header>
 
 <div class="wrap">
-  <div class="tiles">
-    <a class="tile" href="kdw/?m=kdw"><div class="tile-ico">🔧</div><div><div class="tile-title">Einbau + Verbrauchsmaterial</div><div class="tile-sub">LELY, Würth, Berner</div></div><span class="tile-go">›</span></a>
-    <a class="tile" href="kdw/?m=kunde"><div class="tile-ico">🚚</div><div><div class="tile-title">Material für Kunden</div><div class="tile-sub">Fehlendes Material beim Kunden nachbestellen</div></div><span class="tile-go">›</span></a>
-    <a class="tile" href="auto/"><div class="tile-ico">🚗</div><div><div class="tile-title">Material aus dem Auto abbuchen</div><div class="tile-sub">Entnahme für einen Kunden aus dem Auto-Bestand</div></div><span class="tile-go">›</span></a>
-    <a class="tile" href="bestand/"><div class="tile-ico">📦</div><div><div class="tile-title">Bestand zählen</div><div class="tile-sub">Bestandsliste laden, zählen, als Auto-Bestand übernehmen</div></div><span class="tile-go">›</span></a>
+  <div class="hello hidden" id="hello">
+    <div><div class="hello-t">Hallo, <span id="hello-name"></span>!</div><div class="hello-s">Was möchtest du tun?</div></div>
+    <button type="button" class="chip-center" id="chip-center" aria-label="Center ändern"><span id="chip-text"></span><i>▾</i></button>
   </div>
 
-  <div class="sec">
-    <h3>Auto-Bestand sichern</h3>
-    <p>Der Auto-Bestand liegt in deinem Telefon und wird – wenn eine Verbindung besteht – automatisch auf dem Server gespeichert. Zusätzlich kannst du ihn hier als Datei sichern und wiederherstellen.</p>
-    <div id="bk-list"></div>
-    <div class="btns">
-      <button type="button" class="secondary" id="bk-export">💾 Sicherung speichern</button>
-      <button type="button" class="secondary" id="bk-import">📂 Sicherung wiederherstellen</button>
-    </div>
-    <input type="file" id="bk-file" accept=".json,application/json" class="hidden">
-    <div id="bk-msg"></div>
+  <div class="glabel">Bestellen</div>
+  <div class="tiles">
+    <a class="tile" href="kdw/?m=kdw"><div class="tile-ico">🔧</div><div><div class="tile-title">Einbau + Verbrauchsmaterial</div><div class="tile-sub">Bestellung fürs Lager · LELY, Würth, Berner</div></div><span class="tile-go">›</span></a>
+    <a class="tile" href="kdw/?m=kunde"><div class="tile-ico">🚚</div><div><div class="tile-title">Material für Kunden</div><div class="tile-sub">Fehlendes Material beim Kunden nachbestellen</div></div><span class="tile-go">›</span></a>
   </div>
-  <p style="margin:18px 4px 0;text-align:center;font-size:.72rem;color:var(--muted);line-height:1.45">Anonyme Nutzungsstatistik (nur Zähler, ohne Namen und Inhalte).</p>
+
+  <div class="glabel">Aus dem Auto</div>
+  <div class="tiles">
+    <a class="tile t-auto" href="auto/"><div class="tile-ico">🚗</div><div><div class="tile-title">Material aus dem Auto abbuchen</div><div class="tile-sub">Entnahme für einen Kunden aus dem Auto-Bestand</div></div><span class="tile-go">›</span></a>
+  </div>
+
+  <div class="foot2">Letzte Aktualisierung: 18.11.2026<br>Anonyme Nutzungsstatistik (nur Zähler, ohne Namen und Inhalte)</div>
+</div>
+
+<div id="set-modal" class="set-ov hidden">
+  <div class="set-box">
+    <h3 class="t">Einstellungen</h3>
+    <div class="sec">
+      <h3>Center und Name</h3>
+      <div class="who" id="who"></div>
+      <button type="button" class="secondary full" id="btn-who">Center / Name ändern</button>
+    </div>
+    <div class="sec">
+      <h3>Inventur (in Arbeit)</h3>
+      <p>Bestandsliste vom Lager laden, zählen und als Auto-Bestand übernehmen. Wird noch weiterentwickelt.</p>
+      <a class="secondary full" href="bestand/" style="padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);color:var(--ink);font-weight:600;font-size:.85rem">📦 Bestand zählen</a>
+    </div>
+    <div class="sec">
+      <h3>Auto-Bestand sichern</h3>
+      <p>Der Auto-Bestand liegt in deinem Telefon und wird – wenn eine Verbindung besteht – automatisch auf dem Server gespeichert. Zusätzlich kannst du ihn hier als Datei sichern und wiederherstellen.</p>
+      <div id="bk-list"></div>
+      <div class="btns">
+        <button type="button" class="secondary" id="bk-export">💾 Sicherung speichern</button>
+        <button type="button" class="secondary" id="bk-import">📂 Sicherung wiederherstellen</button>
+      </div>
+      <input type="file" id="bk-file" accept=".json,application/json" class="hidden">
+      <div id="bk-msg"></div>
+    </div>
+    <p style="margin:14px 4px 0;text-align:center;font-size:.72rem;color:var(--muted);line-height:1.45">Anonyme Nutzungsstatistik (nur Zähler, ohne Namen und Inhalte).</p>
+    <button type="button" class="set-close" id="btn-set-close">Schließen</button>
+  </div>
 </div>
 
 <script>
@@ -775,7 +831,7 @@ const Stats = (() => {
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 async function paintBackupList(){
-  const el = $('bk-list'); const parts = [];
+  const el = $('bk-list'); if (!el) return; const parts = [];
   for (const lo of Object.keys(PEOPLE)){
     const d = await Autobestand.load(lo);          // gleicht dabei Telefon und Server ab
     if (d) parts.push('<div><b>' + lo + '</b> · ' + esc(PEOPLE[lo][0]) + ' · ' + Object.keys(d.items).length + ' Artikel · Stand ' + stampDE(d.updated) + '</div>');
@@ -791,9 +847,24 @@ $('bk-file').addEventListener('change', async e => {
   try { const n = await Autobestand.restore(f); Stats.event('menu.backup_restore'); msg('Wiederhergestellt: ' + n + ' Lagerort(e).', 'ok'); paintBackupList(); }
   catch(err){ msg(err.message || 'Die Datei konnte nicht gelesen werden.', 'err'); }
 });
+function renderWho(){
+  const lo = savedLagerort();
+  const centerName = lo ? ((CENTERS[PEOPLE[lo][2]] || NO_CENTER).short || PEOPLE[lo][2]) : '';
+  $('who').textContent = lo ? centerName + ' · ' + PEOPLE[lo][0] : 'Noch nicht gewählt';
+  $('hello').classList.toggle('hidden', !lo);   // Begrüßung erst, wenn Center + Name gewählt sind
+  if (lo){ $('hello-name').textContent = PEOPLE[lo][0].split(' ')[0]; $('chip-text').textContent = centerName; }
+}
+const setModal = $('set-modal');
+$('btn-gear').addEventListener('click', () => { renderWho(); paintBackupList(); setModal.classList.remove('hidden'); });
+$('btn-set-close').addEventListener('click', () => setModal.classList.add('hidden'));
+setModal.addEventListener('click', e => { if (e.target === setModal) setModal.classList.add('hidden'); });
+const changeWho = () => { setModal.classList.add('hidden'); welcomeEinbauer(() => renderWho()); };
+$('btn-who').addEventListener('click', changeWho);
+$('chip-center').addEventListener('click', changeWho);
 Stats.pageview('menu');
-paintBackupList();
-if (!savedLagerort()) welcomeEinbauer(() => {});   // neuer Monteur: erst Center, dann Name (gilt dann für alle Seiten)
+renderWho();
+// Erster Besuch: zuerst "Welches Center?", dann der Name (gilt dann für alle Seiten)
+if (!savedLagerort()) welcomeEinbauer(() => renderWho());
 </script>
 </body>
 </html>

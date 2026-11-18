@@ -315,6 +315,35 @@
   .tile-sub{font-size:.8rem;line-height:1.35;}
   .tile-go{font-size:1.5rem;color:var(--lely-red);opacity:.75;}
   .foot2{margin:26px 6px 0;text-align:center;font-size:.72rem;color:var(--muted);line-height:1.6;}
+  /* --- Liquid Glass: milchig-durchscheinende Kacheln, glänzende Icon-Felder, weiche Farbflächen im Hintergrund --- */
+  .orbs{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:radial-gradient(420px 320px at 8% 14%, rgba(226,36,63,.20), transparent 70%),
+               radial-gradient(460px 360px at 96% 46%, rgba(64,120,255,.14), transparent 70%),
+               radial-gradient(420px 320px at 30% 100%, rgba(255,160,60,.14), transparent 70%);}
+  :root[data-theme="dark"] .orbs{background:radial-gradient(420px 320px at 8% 14%, rgba(226,36,63,.30), transparent 70%),
+               radial-gradient(460px 360px at 96% 46%, rgba(64,120,255,.22), transparent 70%),
+               radial-gradient(420px 320px at 30% 100%, rgba(255,140,60,.14), transparent 70%);}
+  @media (prefers-color-scheme: dark){ :root[data-theme="auto"] .orbs{background:radial-gradient(420px 320px at 8% 14%, rgba(226,36,63,.30), transparent 70%),
+               radial-gradient(460px 360px at 96% 46%, rgba(64,120,255,.22), transparent 70%),
+               radial-gradient(420px 320px at 30% 100%, rgba(255,140,60,.14), transparent 70%);} }
+  a.tile{background:rgba(255,255,255,.58);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid rgba(255,255,255,.8);box-shadow:0 10px 30px rgba(20,20,40,.10), inset 0 1px 0 rgba(255,255,255,.95);}
+  :root[data-theme="dark"] a.tile{background:rgba(30,32,40,.52);border-color:rgba(255,255,255,.13);box-shadow:0 12px 32px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10);}
+  @media (prefers-color-scheme: dark){ :root[data-theme="auto"] a.tile{background:rgba(30,32,40,.52);border-color:rgba(255,255,255,.13);box-shadow:0 12px 32px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10);} }
+  .tile-ico{position:relative;width:54px;height:54px;border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:0;
+    background:linear-gradient(145deg,#e8263f,#a60f28);
+    box-shadow:0 8px 18px rgba(200,16,46,.34), inset 0 1px 1px rgba(255,255,255,.75), inset 0 -10px 14px rgba(255,255,255,.10), inset 0 0 0 1px rgba(255,255,255,.22);}
+  .tile-ico::before{content:"";position:absolute;left:1px;right:1px;top:1px;height:48%;border-radius:16px 16px 60% 60%/16px 16px 18px 18px;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0));pointer-events:none;}
+  .tile-ico svg{position:relative;width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 1px rgba(0,0,0,.28));}
+  .tile.t-auto .tile-ico{background:linear-gradient(145deg,#707987,#2b3038);box-shadow:0 8px 18px rgba(30,35,45,.36), inset 0 1px 1px rgba(255,255,255,.7), inset 0 -10px 14px rgba(255,255,255,.08), inset 0 0 0 1px rgba(255,255,255,.2);}
+  .tile-go{display:flex;align-items:center;margin-left:auto;font-size:0;}
+  .tile-go svg{width:18px;height:18px;fill:none;stroke:var(--muted);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.8;}
+  .chip-center{background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(16px) saturate(170%);backdrop-filter:blur(16px) saturate(170%);border-color:rgba(255,255,255,.8);box-shadow:0 4px 14px rgba(20,20,40,.08), inset 0 1px 0 rgba(255,255,255,.9);}
+  :root[data-theme="dark"] .chip-center{background:rgba(30,32,40,.55);border-color:rgba(255,255,255,.14);box-shadow:0 4px 14px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.10);}
+  @media (prefers-color-scheme: dark){ :root[data-theme="auto"] .chip-center{background:rgba(30,32,40,.55);border-color:rgba(255,255,255,.14);box-shadow:0 4px 14px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.10);} }
+  .chip-center svg{width:12px;height:12px;fill:none;stroke:var(--muted);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;}
+  .topbar-gear{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.35);}
+  .topbar-gear svg{width:19px;height:19px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
   #bk-list{font-size:.8rem;margin:0 0 10px;color:var(--ink);}
   #bk-list div{padding:2px 0;}
   #bk-msg{font-size:.82rem;margin-top:8px;font-weight:700;}
@@ -322,6 +351,7 @@
 </style>
 </head>
 <body>
+<div class="orbs" aria-hidden="true"></div>
 
 <header class="topbar">
   <div class="topbar-row1">
@@ -334,25 +364,25 @@
       <div class="topbar-title">Lely KDW</div>
       <div class="topbar-sub">Bestellungen · Auto-Bestand</div>
     </div>
-    <button type="button" class="topbar-gear" id="btn-gear" aria-label="Einstellungen">⚙</button>
+    <button type="button" class="topbar-gear" id="btn-gear" aria-label="Einstellungen"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   </div>
 </header>
 
 <div class="wrap">
   <div class="hello hidden" id="hello">
-    <div><div class="hello-t">Hallo, <span id="hello-name"></span>!</div><div class="hello-s">Was möchtest du tun?</div></div>
-    <button type="button" class="chip-center" id="chip-center" aria-label="Center ändern"><span id="chip-text"></span><i>▾</i></button>
+    <div><div class="hello-t"><span id="hello-word">Hallo</span>, <span id="hello-name"></span>!</div><div class="hello-s" id="hello-s">Was möchtest du tun?</div></div>
+    <button type="button" class="chip-center" id="chip-center" aria-label="Center ändern"><span id="chip-text"></span><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
   </div>
 
   <div class="glabel">Bestellen</div>
   <div class="tiles">
-    <a class="tile" href="kdw/?m=kdw"><div class="tile-ico">🔧</div><div><div class="tile-title">Einbau + Verbrauchsmaterial</div><div class="tile-sub">Bestellung fürs Lager · LELY, Würth, Berner</div></div><span class="tile-go">›</span></a>
-    <a class="tile" href="kdw/?m=kunde"><div class="tile-ico">🚚</div><div><div class="tile-title">Material für Kunden</div><div class="tile-sub">Fehlendes Material beim Kunden nachbestellen</div></div><span class="tile-go">›</span></a>
+    <a class="tile" href="kdw/?m=kdw"><div class="tile-ico"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div><div class="tile-title">Einbau + Verbrauchsmaterial</div><div class="tile-sub">Bestellung fürs Lager · LELY, Würth, Berner</div></div><span class="tile-go"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></span></a>
+    <a class="tile" href="kdw/?m=kunde"><div class="tile-ico"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="14" height="12" rx="1.5"/><path d="M15 8h4l3 3.4V16h-7z"/><circle cx="5.5" cy="18" r="2.2"/><circle cx="18" cy="18" r="2.2"/></svg></div><div><div class="tile-title">Material für Kunden</div><div class="tile-sub">Fehlendes Material beim Kunden nachbestellen</div></div><span class="tile-go"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></span></a>
   </div>
 
   <div class="glabel">Aus dem Auto</div>
   <div class="tiles">
-    <a class="tile t-auto" href="auto/"><div class="tile-ico">🚗</div><div><div class="tile-title">Material aus dem Auto abbuchen</div><div class="tile-sub">Entnahme für einen Kunden aus dem Auto-Bestand</div></div><span class="tile-go">›</span></a>
+    <a class="tile t-auto" href="auto/"><div class="tile-ico"><svg viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></div><div><div class="tile-title">Material aus dem Auto abbuchen</div><div class="tile-sub">Entnahme für einen Kunden aus dem Auto-Bestand</div></div><span class="tile-go"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></span></a>
   </div>
 
   <div class="foot2">Letzte Aktualisierung: 18.11.2026<br>Anonyme Nutzungsstatistik (nur Zähler, ohne Namen und Inhalte)</div>
@@ -369,15 +399,15 @@
     <div class="sec">
       <h3>Inventur (in Arbeit)</h3>
       <p>Bestandsliste vom Lager laden, zählen und als Auto-Bestand übernehmen. Wird noch weiterentwickelt.</p>
-      <a class="secondary full" href="bestand/" style="padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);color:var(--ink);font-weight:600;font-size:.85rem">📦 Bestand zählen</a>
+      <a class="secondary full" href="bestand/" style="padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);color:var(--ink);font-weight:600;font-size:.85rem">Bestand zählen</a>
     </div>
     <div class="sec">
       <h3>Auto-Bestand sichern</h3>
       <p>Der Auto-Bestand liegt in deinem Telefon und wird – wenn eine Verbindung besteht – automatisch auf dem Server gespeichert. Zusätzlich kannst du ihn hier als Datei sichern und wiederherstellen.</p>
       <div id="bk-list"></div>
       <div class="btns">
-        <button type="button" class="secondary" id="bk-export">💾 Sicherung speichern</button>
-        <button type="button" class="secondary" id="bk-import">📂 Sicherung wiederherstellen</button>
+        <button type="button" class="secondary" id="bk-export">Sicherung speichern</button>
+        <button type="button" class="secondary" id="bk-import">Sicherung wiederherstellen</button>
       </div>
       <input type="file" id="bk-file" accept=".json,application/json" class="hidden">
       <div id="bk-msg"></div>
@@ -504,7 +534,7 @@ const Autobestand = {
     } catch(e){ this.status = 'offline'; }
     return { ok: true };
   },
-  statusText(){ return this.status === 'synchronisiert' ? '☁ synchronisiert' : this.status === 'offline' ? '⚠ nur im Telefon gespeichert (offline)' : '📱 nur im Telefon gespeichert'; },
+  statusText(){ return this.status === 'synchronisiert' ? 'synchronisiert' : this.status === 'offline' ? 'nur im Telefon gespeichert (offline)' : 'nur im Telefon gespeichert'; },
   // Datensicherung als Datei (alle Lagerorte, die im Telefon liegen)
   backupBlob(){
     const all = {};
@@ -847,24 +877,55 @@ $('bk-file').addEventListener('change', async e => {
   try { const n = await Autobestand.restore(f); Stats.event('menu.backup_restore'); msg('Wiederhergestellt: ' + n + ' Lagerort(e).', 'ok'); paintBackupList(); }
   catch(err){ msg(err.message || 'Die Datei konnte nicht gelesen werden.', 'err'); }
 });
-function renderWho(){
+// ===== Begrüßung: wechselt je nach Tageszeit und Wochentag (rein lokal, ohne Netzwerk) =====
+const GREET_WORDS = {
+  morning: ['Guten Morgen', 'Servus', 'Moin'],
+  forenoon: ['Servus', 'Hallo', 'Guten Tag'],
+  noon: ['Mahlzeit', 'Servus', 'Hallo'],
+  afternoon: ['Servus', 'Hallo', 'Guten Tag'],
+  evening: ['Guten Abend', 'Servus', 'Hallo'],
+  night: ['Hallo', 'Servus']
+};
+const dayPart = h => h < 5 ? 'night' : h < 10 ? 'morning' : h < 12 ? 'forenoon' : h < 14 ? 'noon' : h < 18 ? 'afternoon' : h < 22 ? 'evening' : 'night';
+function dayLines(d, part){
+  const wd = d.getDay();   // 0 = So
+  if (part === 'night') return ['Noch so spät unterwegs? Was steht an?', 'Spätschicht? Was steht an?'];
+  if (wd === 1 && (part === 'morning' || part === 'forenoon')) return ['Guter Start in die Woche – was steht an?', 'Neue Woche, neue Bestellungen – was steht an?'];
+  if (wd === 5 && (part === 'afternoon' || part === 'evening')) return ['Fast Wochenende – was steht noch an?', 'Endspurt vor dem Wochenende – was steht an?'];
+  if (wd === 0 || wd === 6) return ['Schönes Wochenende – was steht an?', 'Im Einsatz am Wochenende? Was steht an?'];
+  return ['Was möchtest du tun?', 'Was steht heute an?', 'Womit geht es los?'];
+}
+const pickOne = (arr, lastVal) => { const o = arr.filter(x => x !== lastVal); const a = o.length ? o : arr; return a[Math.floor(Math.random() * a.length)]; };
+// Reine Funktion (testbar): date = Date, last = { word, line } der vorigen Begrüßung (wird nicht direkt wiederholt)
+function makeGreeting(date, last){
+  const part = dayPart(date.getHours());
+  return { word: pickOne(GREET_WORDS[part], last && last.word), line: pickOne(dayLines(date, part), last && last.line) };
+}
+function renderGreeting(){
+  if (!savedLagerort()) return;
+  let last = null; try { last = JSON.parse(localStorage.getItem('kdw_greet') || 'null'); } catch(e){}
+  const g = makeGreeting(new Date(), last);
+  $('hello-word').textContent = g.word; $('hello-s').textContent = g.line;
+  try { localStorage.setItem('kdw_greet', JSON.stringify(g)); } catch(e){}
+}
+function renderWho(withGreeting){
   const lo = savedLagerort();
   const centerName = lo ? ((CENTERS[PEOPLE[lo][2]] || NO_CENTER).short || PEOPLE[lo][2]) : '';
   $('who').textContent = lo ? centerName + ' · ' + PEOPLE[lo][0] : 'Noch nicht gewählt';
   $('hello').classList.toggle('hidden', !lo);   // Begrüßung erst, wenn Center + Name gewählt sind
-  if (lo){ $('hello-name').textContent = PEOPLE[lo][0].split(' ')[0]; $('chip-text').textContent = centerName; }
+  if (lo){ $('hello-name').textContent = PEOPLE[lo][0].split(' ')[0]; $('chip-text').textContent = centerName; if (withGreeting) renderGreeting(); }
 }
 const setModal = $('set-modal');
 $('btn-gear').addEventListener('click', () => { renderWho(); paintBackupList(); setModal.classList.remove('hidden'); });
 $('btn-set-close').addEventListener('click', () => setModal.classList.add('hidden'));
 setModal.addEventListener('click', e => { if (e.target === setModal) setModal.classList.add('hidden'); });
-const changeWho = () => { setModal.classList.add('hidden'); welcomeEinbauer(() => renderWho()); };
+const changeWho = () => { setModal.classList.add('hidden'); welcomeEinbauer(() => renderWho(true)); };
 $('btn-who').addEventListener('click', changeWho);
 $('chip-center').addEventListener('click', changeWho);
 Stats.pageview('menu');
-renderWho();
+renderWho(true);
 // Erster Besuch: zuerst "Welches Center?", dann der Name (gilt dann für alle Seiten)
-if (!savedLagerort()) welcomeEinbauer(() => renderWho());
+if (!savedLagerort()) welcomeEinbauer(() => renderWho(true));
 </script>
 </body>
 </html>

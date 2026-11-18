@@ -464,7 +464,7 @@ const Autobestand = {
     } catch(e){ this.status = 'offline'; }
     return { ok: true };
   },
-  statusText(){ return this.status === 'synchronisiert' ? '☁ synchronisiert' : this.status === 'offline' ? '⚠ nur im Telefon gespeichert (offline)' : '📱 nur im Telefon gespeichert'; },
+  statusText(){ return this.status === 'synchronisiert' ? 'synchronisiert' : this.status === 'offline' ? 'nur im Telefon gespeichert (offline)' : 'nur im Telefon gespeichert'; },
   // Datensicherung als Datei (alle Lagerorte, die im Telefon liegen)
   backupBlob(){
     const all = {};

@@ -1,0 +1,6 @@
+/* Lely-Schrift: Noto Sans (Text, 400/600) und Ubuntu (Überschriften, 400/500) – dieselben freien Schriften wie auf lely.com (nur lateinische Zeichen).
+   Lizenzen: Noto Sans = SIL Open Font License 1.1, Ubuntu = Ubuntu Font Licence 1.0. Gemeinsam für alle Seiten, wird vom Browser zwischengespeichert. */
+@font-face { font-family: 'Noto Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url('/assets/NotoSans-400.woff2') format('woff2'); }
+@font-face { font-family: 'Noto Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url('/assets/NotoSans-600.woff2') format('woff2'); }
+@font-face { font-family: 'Ubuntu'; font-style: normal; font-weight: 400; font-display: swap; src: url('/assets/Ubuntu-400.woff2') format('woff2'); }
+@font-face { font-family: 'Ubuntu'; font-style: normal; font-weight: 500; font-display: swap; src: url('/assets/Ubuntu-500.woff2') format('woff2'); }

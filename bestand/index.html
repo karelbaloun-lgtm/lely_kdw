@@ -7,6 +7,8 @@
 <meta name="theme-color" content="#C8102E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23C8102E'/%3E%3Cpath d='M25 40 L50 22 L75 40' fill='none' stroke='white' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='25' y='40' width='50' height='40' rx='4' fill='none' stroke='white' stroke-width='7' stroke-linejoin='round'/%3E%3Cline x1='50' y1='40' x2='50' y2='80' stroke='white' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E">
 <script>(function(){ var t='auto'; try{ t = localStorage.getItem('kdw_theme')||'auto'; }catch(e){} document.documentElement.setAttribute('data-theme', t); })();</script>
+<link rel="stylesheet" href="/assets/fonts.css">
+<script>(function(){ var f = 'lely'; try{ f = localStorage.getItem('kdw_font') || 'lely'; }catch(e){} document.documentElement.setAttribute('data-font', f === 'system' ? 'system' : 'lely'); })();</script>
 <style>
   :root{
     --lely-red:#C8102E; --lely-red-dark:#970C22;
@@ -170,6 +172,10 @@
     :root[data-theme="auto"] .st-more .ist input{box-shadow:0 4px 12px rgba(224,134,0,.22);}
 
   }
+
+  /* einfache Linien-Icons statt Emoji */
+  .ic{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.22em;margin-right:.45em;flex:0 0 auto;}
+  .ic.ic-solo{margin-right:0;}
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:40px;}
   .topbar-menu{flex:0 0 auto;color:#fff;text-decoration:none;font-size:.78rem;font-weight:700;border:1px solid rgba(255,255,255,.4);border-radius:10px;padding:7px 11px;background:rgba(255,255,255,.12);}
@@ -267,6 +273,179 @@
     .chip{flex:1 1 calc(33.333% - 6px);padding:9px 6px;}
     .chip:nth-child(n+4){flex-basis:calc(50% - 6px);}
   }
+/* ===== Lely KDW – gemeinsames "Liquid Glass"-Design (ruhig, erwachsen): gilt für Menü, KDW, Auto, Bestand, Statistik =====
+   Quelle: Lely-Bestand/glass.css – wird vom Generator in alle Seiten eingebettet (nicht in den Seiten direkt ändern). */
+
+/* --- Farben/Flächen je Design (hell / dunkel / System) --- */
+:root[data-theme]{
+  --g-bg:#eceff3;
+  --g-orbs:radial-gradient(520px 380px at 6% 0%, rgba(200,16,46,.10), transparent 70%),
+           radial-gradient(560px 420px at 100% 38%, rgba(70,110,200,.09), transparent 70%),
+           radial-gradient(480px 360px at 20% 100%, rgba(255,150,70,.07), transparent 70%);
+  --g-surf:rgba(255,255,255,.66);
+  --g-surf-strong:rgba(255,255,255,.88);
+  --g-brd:rgba(255,255,255,.78);
+  --g-line:rgba(15,23,42,.09);
+  --g-input:rgba(255,255,255,.80);
+  --g-sh:0 1px 2px rgba(15,23,42,.05), 0 12px 30px rgba(15,23,42,.07);
+  --g-hi:inset 0 1px 0 rgba(255,255,255,.9);
+  --g-ink-soft:#4d5663;
+  --g-tint:rgba(200,16,46,.09);
+  --g-tint-brd:rgba(200,16,46,.18);
+  --g-tint-ink:#b50e29;
+  --g-slate:rgba(71,85,105,.12);
+  --g-slate-brd:rgba(71,85,105,.22);
+  --g-slate-ink:#3c4756;
+}
+:root[data-theme="dark"]{
+  --g-bg:#0b0d11;
+  --g-orbs:radial-gradient(520px 380px at 6% 0%, rgba(200,16,46,.20), transparent 70%),
+           radial-gradient(560px 420px at 100% 38%, rgba(70,110,220,.15), transparent 70%),
+           radial-gradient(480px 360px at 20% 100%, rgba(255,140,60,.08), transparent 70%);
+  --g-surf:rgba(27,30,37,.60);
+  --g-surf-strong:rgba(30,33,41,.88);
+  --g-brd:rgba(255,255,255,.09);
+  --g-line:rgba(255,255,255,.08);
+  --g-input:rgba(255,255,255,.055);
+  --g-sh:0 12px 32px rgba(0,0,0,.38);
+  --g-hi:inset 0 1px 0 rgba(255,255,255,.06);
+  --g-ink-soft:#a5adb9;
+  --g-tint:rgba(255,90,112,.13);
+  --g-tint-brd:rgba(255,90,112,.26);
+  --g-tint-ink:#ff8798;
+  --g-slate:rgba(148,163,184,.13);
+  --g-slate-brd:rgba(148,163,184,.26);
+  --g-slate-ink:#b6c0cf;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-theme="auto"]{
+    --g-bg:#0b0d11;
+    --g-orbs:radial-gradient(520px 380px at 6% 0%, rgba(200,16,46,.20), transparent 70%),
+             radial-gradient(560px 420px at 100% 38%, rgba(70,110,220,.15), transparent 70%),
+             radial-gradient(480px 360px at 20% 100%, rgba(255,140,60,.08), transparent 70%);
+    --g-surf:rgba(27,30,37,.60); --g-surf-strong:rgba(30,33,41,.88); --g-brd:rgba(255,255,255,.09); --g-line:rgba(255,255,255,.08);
+    --g-input:rgba(255,255,255,.055); --g-sh:0 12px 32px rgba(0,0,0,.38); --g-hi:inset 0 1px 0 rgba(255,255,255,.06); --g-ink-soft:#a5adb9;
+    --g-tint:rgba(255,90,112,.13); --g-tint-brd:rgba(255,90,112,.26); --g-tint-ink:#ff8798;
+    --g-slate:rgba(148,163,184,.13); --g-slate-brd:rgba(148,163,184,.26); --g-slate-ink:#b6c0cf;
+  }
+}
+
+/* --- Schrift (Einstellung "Schrift" im Menü: Lely = Noto Sans + Ubuntu, System = Segoe UI/Arial) --- */
+:root{--sans:'Segoe UI', Arial, Helvetica, sans-serif;--font-head:var(--sans);}
+:root[data-font="lely"]{--sans:'Noto Sans','Segoe UI',Arial,Helvetica,sans-serif;--font-head:'Ubuntu','Noto Sans','Segoe UI',Arial,Helvetica,sans-serif;}
+:root[data-theme] body{font-family:var(--sans);}
+:root[data-theme] .topbar-title, :root[data-theme] .modal-box h3, :root[data-theme] .set-box h3.t, :root[data-theme] .start h2, :root[data-theme] .hello-t, :root[data-theme] .tile-title{font-family:var(--font-head);font-weight:500;font-synthesis:none;}
+
+/* --- Hintergrund --- */
+:root[data-theme] body{background:var(--g-orbs), var(--g-bg);background-attachment:fixed;}
+
+/* --- Kopfzeile: ruhiges Rot, feine Lichtkante --- */
+:root[data-theme] header.topbar{
+  background:linear-gradient(180deg,var(--lely-red),var(--lely-red-dark));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20), 0 8px 26px rgba(120,10,30,.20);
+  border-bottom:1px solid rgba(255,255,255,.10);
+}
+:root[data-theme] header.topbar::after{display:none;}
+.topbar-menu, .topbar-settings, .topbar-gear, .topbar-btn{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;min-width:36px;padding:0 11px;border-radius:11px;
+  border:1px solid rgba(255,255,255,.34);background:rgba(255,255,255,.14);color:#fff;text-decoration:none;font-size:.78rem;font-weight:700;cursor:pointer;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.28);font-family:inherit;align-self:center;
+}
+.topbar-settings, .topbar-gear{width:36px;padding:0;}
+.topbar-menu:active, .topbar-settings:active, .topbar-gear:active{background:rgba(255,255,255,.28);}
+.topbar-menu .ic{margin-right:0;}
+.topbar-actions{display:flex;gap:8px;flex:0 0 auto;align-items:center;margin-left:auto;}
+
+/* --- Flächen (Karten) --- */
+:root[data-theme] .meta-card, :root[data-theme] .search-box, :root[data-theme] details.group, :root[data-theme] .kunde-card,
+:root[data-theme] .start, :root[data-theme] .progress, :root[data-theme] .export, :root[data-theme] .card, :root[data-theme] .sec,
+:root[data-theme] .cart-preview{
+  background:var(--g-surf);border:1px solid var(--g-brd);border-radius:16px;box-shadow:var(--g-sh), var(--g-hi);
+  -webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);
+}
+:root[data-theme] details.group{overflow:hidden;}
+:root[data-theme] details.group[open]{border-color:var(--g-tint-brd);box-shadow:var(--g-sh), var(--g-hi), 0 0 0 1px var(--g-tint);}
+:root[data-theme] details.group:hover{box-shadow:var(--g-sh), var(--g-hi);}
+:root[data-theme] details.group summary{background:transparent;}
+:root[data-theme] details.group summary .count{background:var(--g-input);border:1px solid var(--g-line);}
+:root[data-theme] .item-row{border-top-color:var(--g-line);}
+:root[data-theme] .item-thumb{background:var(--g-input);border:1px solid var(--g-line);}
+:root[data-theme] .sec{padding:14px 16px;}
+:root[data-theme] .search-box{border-radius:14px;}
+
+/* --- Eingabefelder --- */
+:root[data-theme] .field input, :root[data-theme] .field select, :root[data-theme] .settings-select, :root[data-theme] .extra-text,
+:root[data-theme] .item-qty-wrap input, :root[data-theme] .ist input, :root[data-theme] .note, :root[data-theme] .field .ro{
+  background:var(--g-input);border:1px solid var(--g-line);border-radius:10px;box-shadow:inset 0 1px 2px rgba(15,23,42,.04);
+}
+:root[data-theme] .field.readonly input{background:transparent;}
+:root[data-theme] .search-box input{background:transparent;box-shadow:none;border:none;}
+:root[data-theme] input:focus, :root[data-theme] select:focus, :root[data-theme] textarea:focus{outline:none;border-color:var(--lely-red);box-shadow:0 0 0 3px rgba(200,16,46,.14);}
+:root[data-theme] .search-box input:focus{box-shadow:none;}
+
+/* --- Schaltflächen --- */
+:root[data-theme] button.primary, :root[data-theme] .modal-choice-btn.modal-primary, :root[data-theme] .mbtn.primary{
+  background:linear-gradient(180deg,var(--lely-red),var(--lely-red-dark));color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 6px 16px rgba(150,12,36,.24);
+}
+:root[data-theme] button.primary:hover{filter:brightness(1.05);}
+:root[data-theme] button.secondary, :root[data-theme] .modal-choice-btn, :root[data-theme] .mbtn, :root[data-theme] .cart-count,
+:root[data-theme] .kunde-card .kc-edit, :root[data-theme] .chip-center, :root[data-theme] .btn-copy-link, :root[data-theme] .tab-btn, :root[data-theme] .chip, :root[data-theme] .rcpt button{
+  background:var(--g-surf);border:1px solid var(--g-brd);border-radius:12px;color:var(--ink);box-shadow:var(--g-hi), 0 1px 2px rgba(15,23,42,.05);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);
+}
+:root[data-theme] .modal-choice-btn.modal-primary, :root[data-theme] .mbtn.primary, :root[data-theme] .tab-btn.active{color:#fff;}
+:root[data-theme] .tab-btn.active{background:linear-gradient(180deg,var(--lely-red),var(--lely-red-dark));border-color:rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 6px 16px rgba(150,12,36,.22);}
+:root[data-theme] .chip.active{border-color:var(--lely-red);box-shadow:var(--g-hi), 0 0 0 2px rgba(200,16,46,.14);}
+:root[data-theme] .cart-count.has-items{border-color:var(--g-tint-brd);background:var(--g-tint);color:var(--g-tint-ink);}
+:root[data-theme] .theme-seg, :root[data-theme] .seg{background:var(--g-input);border:1px solid var(--g-line);border-radius:12px;}
+:root[data-theme] .theme-btn.active, :root[data-theme] .font-btn.active, :root[data-theme] .seg button.active{background:var(--g-surf-strong);border:1px solid var(--g-brd);box-shadow:var(--g-hi), 0 1px 3px rgba(15,23,42,.12);}
+
+/* --- Dialoge --- */
+:root[data-theme] .modal-overlay, :root[data-theme] .set-ov, :root[data-theme] .kw-ov{background:rgba(12,14,20,.36);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+:root[data-theme] .modal-box, :root[data-theme] .set-box, :root[data-theme] .kw-box{
+  background:var(--g-surf-strong);border:1px solid var(--g-brd);border-radius:22px;
+  box-shadow:0 28px 70px rgba(10,12,20,.30), var(--g-hi);-webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%);
+}
+:root[data-theme] .modal-box .sec, :root[data-theme] .set-box .sec{background:var(--g-input);box-shadow:none;border-color:var(--g-line);-webkit-backdrop-filter:none;backdrop-filter:none;}
+:root[data-theme] .kw-btn{background:var(--g-input);border-color:var(--g-line);border-radius:12px;}
+:root[data-theme] .warnbox{border-radius:12px;}
+
+/* --- Fußleisten --- */
+:root[data-theme] footer.bar, :root[data-theme] .sendbar{
+  background:var(--g-surf-strong);border-top:1px solid var(--g-brd);box-shadow:0 -10px 30px rgba(15,23,42,.08), var(--g-hi);
+  -webkit-backdrop-filter:blur(24px) saturate(170%);backdrop-filter:blur(24px) saturate(170%);
+}
+
+/* --- Menü-Startseite: ruhige, getönte Icon-Felder statt glänzender Kacheln --- */
+:root[data-theme] a.tile{background:var(--g-surf);border:1px solid var(--g-brd);box-shadow:var(--g-sh), var(--g-hi);border-radius:18px;
+  -webkit-backdrop-filter:blur(22px) saturate(165%);backdrop-filter:blur(22px) saturate(165%);color:var(--ink);}
+:root[data-theme] a.tile:hover{border-color:var(--g-tint-brd);}
+:root[data-theme] .tile-ico{width:50px;height:50px;border-radius:15px;background:var(--g-tint);box-shadow:inset 0 0 0 1px var(--g-tint-brd);border:none;}
+:root[data-theme] .tile-ico::before{display:none;}
+:root[data-theme] .tile-ico svg{width:25px;height:25px;stroke:var(--g-tint-ink);stroke-width:1.7;filter:none;}
+:root[data-theme] .tile.t-auto .tile-ico{background:var(--g-slate);box-shadow:inset 0 0 0 1px var(--g-slate-brd);}
+:root[data-theme] .tile.t-auto .tile-ico svg{stroke:var(--g-slate-ink);}
+:root[data-theme] .tile-go svg{stroke:var(--g-ink-soft);}
+:root[data-theme] .chip-center{border-radius:999px;}
+
+/* --- Kopfzeile: Titel links, Menü + Zahnrad rechts – immer in einer Zeile --- */
+:root[data-theme] .topbar-row1{flex-wrap:nowrap;gap:12px;align-items:center;}
+:root[data-theme] .topbar-left{flex:1 1 auto;min-width:0;}
+:root[data-theme] .topbar-title{white-space:normal;line-height:1.15;}
+:root[data-theme] .topbar-sub{white-space:normal;line-height:1.25;font-size:.68rem;letter-spacing:.02em;}
+
+/* --- Filter-Chips behalten ihre Statusfarben --- */
+:root[data-theme] .chip.ok{color:var(--ok);}
+:root[data-theme] .chip.less{color:var(--less);}
+:root[data-theme] .chip.more{color:var(--more);}
+
+/* --- Segment-Schalter (Design / Schrift / Dateiformat) --- */
+.seg{display:flex;gap:4px;padding:4px;margin:6px 0 2px;}
+.seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid transparent;background:none;padding:9px 6px;border-radius:9px;font-weight:700;font-size:.85rem;color:var(--muted);cursor:pointer;font-family:inherit;}
+.seg button.active{color:var(--ink);}
+.seg .ic{margin-right:0;}
+
 </style>
 </head>
 <body>
@@ -282,7 +461,7 @@
       <div class="topbar-title">Lely Bestand</div>
       <div class="topbar-sub" id="sub">Keine Liste geladen</div>
     </div>
-    <a class="topbar-menu" href="../">☰ Menü</a>
+    <div class="topbar-actions"><a class="topbar-menu" href="../"><svg class="ic ic-solo" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Menü</a></div>
   </div>
 </header>
 
@@ -293,7 +472,7 @@
     <h2>Bestandsliste laden</h2>
     <p>Wähle die Excel-Datei mit deinem Bestand (vom Lager).<br>Die Datei bleibt auf deinem Gerät und wird nirgends hochgeladen.</p>
     <div class="drop" id="drop">
-      <button type="button" class="primary" id="btn-pick">📂 Excel-Datei auswählen</button>
+      <button type="button" class="primary" id="btn-pick"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Excel-Datei auswählen</button>
       <p style="margin:10px 0 0;font-size:.8rem">oder Datei hierher ziehen</p>
     </div>
     <input type="file" id="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="hidden">
@@ -316,7 +495,7 @@
       <input id="search" type="text" placeholder="Suchen (Nummer oder Name) ...">
     </div>
     <div class="tools">
-      <button type="button" class="secondary" id="btn-new">📂 Neue Liste laden</button>
+      <button type="button" class="secondary" id="btn-new"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Neue Liste laden</button>
       <button type="button" class="secondary" id="btn-reset">Zählung zurücksetzen</button>
     </div>
     <main id="main"></main>
@@ -324,14 +503,14 @@
       <b>Ergebnis als Excel exportieren</b>
       <p>Erstellt eine Excel-Datei mit Soll, Ist, Differenz und Status (farbig) sowie einem Blatt nur mit den Abweichungen.</p>
       <div class="btns">
-        <button type="button" class="primary" id="btn-export">📥 Als Excel exportieren</button>
+        <button type="button" class="primary" id="btn-export"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Als Excel exportieren</button>
       </div>
     </div>
     <div class="export">
       <b>Auto-Bestand</b>
       <p id="stock-info">–</p>
       <div class="btns">
-        <button type="button" class="primary" id="btn-stock">🚗 Als Auto-Bestand übernehmen</button>
+        <button type="button" class="primary" id="btn-stock"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>Als Auto-Bestand übernehmen</button>
       </div>
       <p style="margin:10px 0 0">Gezählte Mengen werden übernommen, nicht gezählte Artikel mit dem Soll aus der Liste. Danach kann der Bestand in „Material aus dem Auto abbuchen“ verwendet werden.</p>
     </div>

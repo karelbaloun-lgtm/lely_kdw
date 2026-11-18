@@ -14,3 +14,5 @@
 !netlify/
 !netlify/functions/
 !netlify/functions/*.mjs
+!assets/
+!assets/*

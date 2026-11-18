@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="cs">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>Nutzungsstatistik</title>
+<title>Statistika používání</title>
 <meta name="theme-color" content="#C8102E">
 <script>(function(){ var t='auto'; try{ t = localStorage.getItem('kdw_theme')||'auto'; }catch(e){} document.documentElement.setAttribute('data-theme', t); })();</script>
 <style>
@@ -300,29 +300,29 @@
 <header class="topbar">
   <div class="topbar-row1">
     <div class="topbar-left">
-      <div class="topbar-title">Nutzungsstatistik</div>
-      <div class="topbar-sub" id="sub">Anonym · nur Zähler</div>
+      <div class="topbar-title">Statistika používání</div>
+      <div class="topbar-sub" id="sub">Anonymní · jen počítadla</div>
     </div>
-    <a class="topbar-menu" href="../">☰ Menü</a>
+    <a class="topbar-menu" href="../">☰ Menu</a>
   </div>
 </header>
 <div class="wrap">
   <div class="rng" id="rng">
-    <button type="button" class="secondary" data-d="7">7 Tage</button>
-    <button type="button" class="secondary active" data-d="30">30 Tage</button>
-    <button type="button" class="secondary" data-d="90">90 Tage</button>
+    <button type="button" class="secondary" data-d="7">7 dní</button>
+    <button type="button" class="secondary active" data-d="30">30 dní</button>
+    <button type="button" class="secondary" data-d="90">90 dní</button>
   </div>
   <div class="err hidden" id="err"></div>
   <div id="out"></div>
-  <div class="foot">Es werden nur Zähler gespeichert (Seite, Ablauf-Schritt, Dauer, Gerät, Center). Keine Namen, keine Kunden- oder Bestelldaten, keine Suchbegriffe, keine IDs. Die Zahlen sind ungefähre Werte. Dieses Gerät ausnehmen: Seite mit <b>?nostats=1</b> öffnen.</div>
+  <div class="foot">Ukládají se jen počítadla (stránka, krok postupu, doba, zařízení, centrum). Žádná jména, údaje o zákaznících ani objednávkách, žádná hledaná slova ani identifikátory. Čísla jsou přibližná. Vyřazení tohoto zařízení: otevřít stránku s <b>?nostats=1</b>.</div>
 </div>
 <script>
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const PAGE_NAMES = { menu: 'Menü', kdw: 'Einbau + Verbrauchsmaterial', kunde: 'Material für Kunden', auto: 'Material aus dem Auto', bestand: 'Bestand zählen', start: 'Direkt (Einstieg)' };
+const PAGE_NAMES = { menu: 'Menu', kdw: 'Einbau + Verbrauchsmaterial (objednávka do skladu)', kunde: 'Material für Kunden (pro zákazníka)', auto: 'Material aus dem Auto (odpis z auta)', bestand: 'Bestand zählen (počítání zásob)', start: 'Přímý vstup' };
 const BUCKETS = ['<10s', '10-30s', '30-60s', '1-3m', '3-10m', '>10m'];
 const BCOL = ['#bfe3c0', '#8fd194', '#ffd98a', '#ffb44d', '#ef7a6a', '#c8102E'];
-const BLAB = { '<10s': 'unter 10 s', '10-30s': '10–30 s', '30-60s': '30–60 s', '1-3m': '1–3 min', '3-10m': '3–10 min', '>10m': 'über 10 min' };
+const BLAB = { '<10s': 'pod 10 s', '10-30s': '10–30 s', '30-60s': '30–60 s', '1-3m': '1–3 min', '3-10m': '3–10 min', '>10m': 'přes 10 min' };
 
 function merge(days){
   const t = { n: 0, pv: {}, tr: {}, ev: {}, dev: {}, ctr: {}, dur: {}, evdur: {} }, perDay = {};
@@ -336,7 +336,7 @@ const n0 = v => v || 0;
 const pct = (a, b) => b ? Math.round(a * 100 / b) + ' %' : '–';
 function bars(items, total){   // [[label, value]]
   const max = Math.max(1, ...items.map(i => i[1]));
-  return items.length ? items.map(([l, v]) => '<div class="row"><div class="lab">' + esc(l) + '</div><div class="bar2"><i style="width:' + (v * 100 / max) + '%"></i></div><div class="num">' + v + (total ? ' <em>' + pct(v, total) + '</em>' : '') + '</div></div>').join('') : '<div class="none">Noch keine Daten.</div>';
+  return items.length ? items.map(([l, v]) => '<div class="row"><div class="lab">' + esc(l) + '</div><div class="bar2"><i style="width:' + (v * 100 / max) + '%"></i></div><div class="num">' + v + (total ? ' <em>' + pct(v, total) + '</em>' : '') + '</div></div>').join('') : '<div class="none">Zatím žádná data.</div>';
 }
 function funnel(title, steps, extra){   // steps: [[label, value]], erster Schritt = 100 %
   const first = steps[0][1];
@@ -351,47 +351,47 @@ const legend = '<div class="leg">' + BUCKETS.map((b, i) => '<span><i style="back
 
 function render(days, nd){
   const { t, perDay } = merge(days), ev = k => n0(t.ev[k]);
-  if (!t.n){ $('out').innerHTML = '<div class="sec"><div class="none">Im gewählten Zeitraum sind noch keine Daten vorhanden.</div></div>'; return; }
+  if (!t.n){ $('out').innerHTML = '<div class="sec"><div class="none">Ve zvoleném období zatím nejsou žádná data.</div></div>'; return; }
   const pvTotal = Object.values(t.pv).reduce((a, b) => a + b, 0), activeDays = Object.values(perDay).filter(v => v > 0).length;
   let h = '<div class="sec"><div class="kpis">' +
-    '<div class="kpi"><b>' + pvTotal + '</b><span>Seitenaufrufe</span></div>' +
-    '<div class="kpi"><b>' + activeDays + '</b><span>Tage mit Nutzung</span></div>' +
-    '<div class="kpi"><b>' + pct(n0(t.dev.mobile), n0(t.dev.mobile) + n0(t.dev.desktop)) + '</b><span>Handy</span></div>' +
-    '<div class="kpi"><b>' + ev('search.miss') + '</b><span>Suchen ohne Treffer</span></div></div></div>';
+    '<div class="kpi"><b>' + pvTotal + '</b><span>Zobrazení stránek</span></div>' +
+    '<div class="kpi"><b>' + activeDays + '</b><span>Dny s používáním</span></div>' +
+    '<div class="kpi"><b>' + pct(n0(t.dev.mobile), n0(t.dev.mobile) + n0(t.dev.desktop)) + '</b><span>Mobil</span></div>' +
+    '<div class="kpi"><b>' + ev('search.miss') + '</b><span>Hledání bez výsledku</span></div></div></div>';
   // Tage
   const dayKeys = Object.keys(perDay).sort(), maxD = Math.max(1, ...Object.values(perDay));
-  h += '<div class="sec"><h3>Nutzung pro Tag</h3><div class="days">' + dayKeys.map(k => '<i style="height:' + (perDay[k] * 100 / maxD) + '%" title="' + k + ': ' + perDay[k] + ' Ereignisse"></i>').join('') + '</div></div>';
+  h += '<div class="sec"><h3>Používání po dnech</h3><div class="days">' + dayKeys.map(k => '<i style="height:' + (perDay[k] * 100 / maxD) + '%" title="' + k + ': ' + perDay[k] + ' událostí"></i>').join('') + '</div></div>';
   // Seiten
-  h += '<div class="sec"><h3>Meistbesuchte Seiten</h3>' + bars(Object.keys(t.pv).map(k => [PAGE_NAMES[k] || k, t.pv[k]]).sort((a, b) => b[1] - a[1]), pvTotal) + '</div>';
+  h += '<div class="sec"><h3>Nejnavštěvovanější stránky</h3>' + bars(Object.keys(t.pv).map(k => [PAGE_NAMES[k] || k, t.pv[k]]).sort((a, b) => b[1] - a[1]), pvTotal) + '</div>';
   // Wege
-  h += '<div class="sec"><h3>Wege zwischen den Seiten</h3><small>Von wo nach wo wird gewechselt („Direkt“ = erste Seite eines Besuchs).</small>' +
+  h += '<div class="sec"><h3>Cesty mezi stránkami</h3><small>Odkud kam se přechází („Přímý vstup“ = první stránka návštěvy).</small>' +
     bars(Object.keys(t.tr).map(k => { const [f, to] = k.split('>'); return [(PAGE_NAMES[f] || f) + ' → ' + (PAGE_NAMES[to] || to), t.tr[k]]; }).sort((a, b) => b[1] - a[1]).slice(0, 12)) + '</div>';
   // Abläufe
   const sentK = ev('kdw.sent_center') + ev('kdw.sent_home');
-  h += funnel('Ablauf: Einbau + Verbrauchsmaterial', [['Seite geöffnet', n0(t.pv.kdw)], ['Artikel gewählt', ev('kdw.cart')], ['„Senden“ geklickt', ev('kdw.send_click')], ['E-Mail geöffnet', sentK]],
-    'Lieferung: Center ' + ev('kdw.sent_center') + ' · Heimadresse ' + ev('kdw.sent_home'));
+  h += funnel('Postup: Einbau + Verbrauchsmaterial', [['Stránka otevřena', n0(t.pv.kdw)], ['Vybráno zboží', ev('kdw.cart')], ['Kliknuto na „Senden“', ev('kdw.send_click')], ['E-mail otevřen', sentK]],
+    'Dodání: centrum ' + ev('kdw.sent_center') + ' · domácí adresa ' + ev('kdw.sent_home'));
   const sentC = ev('kunde.sent_express') + ev('kunde.sent_kunde') + ev('kunde.sent_abholung');
-  h += funnel('Ablauf: Material für Kunden', [['Seite geöffnet', n0(t.pv.kunde)], ['Kundendaten bestätigt', ev('kunde.dialog_ok')], ['Artikel gewählt', ev('kunde.cart')], ['„Senden“ geklickt', ev('kunde.send_click')], ['E-Mail geöffnet', sentC]],
-    'Versand: Express ' + ev('kunde.sent_express') + ' · Lieferung an Kunden ' + ev('kunde.sent_kunde') + ' · Abholung ' + ev('kunde.sent_abholung') +
-    '<br>Nicht gelistete Artikel eingetragen: ' + ev('kunde.extra_used') + ' · zweite E-Mail geöffnet: ' + ev('kunde.extra_mail') +
-    '<br>Materialliste PDF: ' + ev('kunde.pdf_ok') + ' gelesen / ' + ev('kunde.pdf_fail') + ' fehlgeschlagen · Foto: ' + ev('kunde.foto_ok') + ' / ' + ev('kunde.foto_fail'));
+  h += funnel('Postup: Material für Kunden', [['Stránka otevřena', n0(t.pv.kunde)], ['Údaje o zákazníkovi potvrzeny', ev('kunde.dialog_ok')], ['Vybráno zboží', ev('kunde.cart')], ['Kliknuto na „Senden“', ev('kunde.send_click')], ['E-mail otevřen', sentC]],
+    'Doprava: Express ' + ev('kunde.sent_express') + ' · dodání zákazníkovi ' + ev('kunde.sent_kunde') + ' · vyzvednutí ' + ev('kunde.sent_abholung') +
+    '<br>Vyplněné nezařazené položky: ' + ev('kunde.extra_used') + ' · druhý e-mail otevřen: ' + ev('kunde.extra_mail') +
+    '<br>Materialliste PDF: ' + ev('kunde.pdf_ok') + ' přečteno / ' + ev('kunde.pdf_fail') + ' selhalo · foto: ' + ev('kunde.foto_ok') + ' / ' + ev('kunde.foto_fail'));
   const booked = ev('auto.booked.xlsx') + ev('auto.booked.pdf');
-  h += funnel('Ablauf: Material aus dem Auto abbuchen', [['Seite geöffnet', n0(t.pv.auto)], ['Artikel gewählt', ev('auto.cart')], ['„Abbuchen“ geöffnet', ev('auto.finish_open')], ['Gebucht', booked]],
-    'Format: Excel ' + ev('auto.booked.xlsx') + ' · PDF ' + ev('auto.booked.pdf') + ' · Teilen ' + ev('auto.share_shared') + ' (abgebrochen ' + ev('auto.share_cancelled') + ') · Download ' + (ev('auto.download') + ev('auto.share_unsupported')) +
-    '<br>Ohne Auto-Bestand geöffnet: ' + ev('auto.nostock') + ' · Materialliste PDF: ' + ev('auto.pdf_ok') + ' / ' + ev('auto.pdf_fail') + ' · Foto: ' + ev('auto.foto_ok') + ' / ' + ev('auto.foto_fail'));
-  h += funnel('Ablauf: Bestand zählen', [['Seite geöffnet', n0(t.pv.bestand)], ['Liste geladen', ev('bestand.list_loaded')], ['Als Excel exportiert', ev('bestand.export')], ['Als Auto-Bestand übernommen', ev('bestand.stock_commit')]],
-    'Liste nicht lesbar: ' + ev('bestand.list_error') + ' · Menü: Sicherung gespeichert ' + ev('menu.backup_export') + ', wiederhergestellt ' + ev('menu.backup_restore'));
+  h += funnel('Postup: Material aus dem Auto abbuchen', [['Stránka otevřena', n0(t.pv.auto)], ['Vybráno zboží', ev('auto.cart')], ['Otevřeno „Abbuchen“', ev('auto.finish_open')], ['Odepsáno', booked]],
+    'Formát: Excel ' + ev('auto.booked.xlsx') + ' · PDF ' + ev('auto.booked.pdf') + ' · sdílení ' + ev('auto.share_shared') + ' (zrušeno ' + ev('auto.share_cancelled') + ') · stažení ' + (ev('auto.download') + ev('auto.share_unsupported')) +
+    '<br>Otevřeno bez stavu auta: ' + ev('auto.nostock') + ' · Materialliste PDF: ' + ev('auto.pdf_ok') + ' / ' + ev('auto.pdf_fail') + ' · foto: ' + ev('auto.foto_ok') + ' / ' + ev('auto.foto_fail'));
+  h += funnel('Postup: Bestand zählen', [['Stránka otevřena', n0(t.pv.bestand)], ['Seznam načten', ev('bestand.list_loaded')], ['Exportováno do Excelu', ev('bestand.export')], ['Převzato jako stav auta', ev('bestand.stock_commit')]],
+    'Seznam nečitelný: ' + ev('bestand.list_error') + ' · Menu: záloha uložena ' + ev('menu.backup_export') + ', obnovena ' + ev('menu.backup_restore'));
   // Dauer
   const durPages = Object.keys(t.pv).map(p => durRow(PAGE_NAMES[p] || p, b => n0(t.dur[p + '|' + b]))).join('');
-  h += '<div class="sec"><h3>Verweildauer pro Seite</h3><small>Wie lange die Seite jeweils sichtbar war, bevor man weggeht oder die App in den Hintergrund legt.</small>' + (durPages || '<div class="none">Noch keine Daten.</div>') + (durPages ? legend : '') + '</div>';
-  const DONE = [['kdw.sent_center', 'Einbau + Verbrauch. → Center'], ['kdw.sent_home', 'Einbau + Verbrauch. → Heimadresse'], ['kunde.sent_express', 'Kunde → Express'], ['kunde.sent_kunde', 'Kunde → an Kunden'], ['kunde.sent_abholung', 'Kunde → Abholung'], ['auto.booked.xlsx', 'Auto → Excel'], ['auto.booked.pdf', 'Auto → PDF'], ['bestand.export', 'Bestand → Export']];
+  h += '<div class="sec"><h3>Doba na stránce</h3><small>Jak dlouho byla stránka viditelná, než se odešlo nebo aplikace přešla do pozadí.</small>' + (durPages || '<div class="none">Zatím žádná data.</div>') + (durPages ? legend : '') + '</div>';
+  const DONE = [['kdw.sent_center', 'Einbau + Verbrauch. → centrum'], ['kdw.sent_home', 'Einbau + Verbrauch. → domů'], ['kunde.sent_express', 'Zákazník → Express'], ['kunde.sent_kunde', 'Zákazník → zákazníkovi'], ['kunde.sent_abholung', 'Zákazník → vyzvednutí'], ['auto.booked.xlsx', 'Auto → Excel'], ['auto.booked.pdf', 'Auto → PDF'], ['bestand.export', 'Bestand → export']];
   const durDone = DONE.map(([k, l]) => durRow(l, b => n0(t.evdur[k + '|' + b]))).join('');
-  h += '<div class="sec"><h3>Dauer bis zum Abschluss</h3><small>Zeit vom Öffnen der Seite bis zum Absenden – je länger, desto umständlicher der Weg.</small>' + (durDone || '<div class="none">Noch keine Daten.</div>') + (durDone ? legend : '') + '</div>';
+  h += '<div class="sec"><h3>Doba do dokončení</h3><small>Čas od otevření stránky do odeslání – čím delší, tím složitější cesta.</small>' + (durDone || '<div class="none">Zatím žádná data.</div>') + (durDone ? legend : '') + '</div>';
   // Geräte / Center
-  h += '<div class="sec"><h3>Geräte und Center</h3>' + bars([['Handy', n0(t.dev.mobile)], ['Computer', n0(t.dev.desktop)]], n0(t.dev.mobile) + n0(t.dev.desktop)) + '<div style="height:8px"></div>' +
+  h += '<div class="sec"><h3>Zařízení a centra</h3>' + bars([['Mobil', n0(t.dev.mobile)], ['Počítač', n0(t.dev.desktop)]], n0(t.dev.mobile) + n0(t.dev.desktop)) + '<div style="height:8px"></div>' +
     bars(Object.keys(t.ctr).map(k => [k, t.ctr[k]]).sort((a, b) => b[1] - a[1]), Object.values(t.ctr).reduce((a, b) => a + b, 0)) + '</div>';
   $('out').innerHTML = h;
-  $('sub').textContent = 'Letzte ' + nd + ' Tage · anonym · nur Zähler';
+  $('sub').textContent = 'Posledních ' + nd + ' dní · anonymní · jen počítadla';
 }
 let days = 30;
 async function load(){
@@ -400,7 +400,7 @@ async function load(){
     const r = await fetch('/api/stats?days=' + days, { cache: 'no-store' });
     if (!r.ok || !(r.headers.get('content-type') || '').includes('json')) throw new Error('kein Server');
     render((await r.json()).days || {}, days);
-  } catch(e){ $('out').innerHTML = ''; $('err').textContent = 'Die Statistik konnte nicht geladen werden (nur auf der Live-Seite verfügbar).'; $('err').classList.remove('hidden'); }
+  } catch(e){ $('out').innerHTML = ''; $('err').textContent = 'Statistiku se nepodařilo načíst (funguje jen na ostré stránce).'; $('err').classList.remove('hidden'); }
 }
 $('rng').addEventListener('click', e => {
   const b = e.target.closest('button[data-d]'); if (!b) return;

@@ -798,6 +798,46 @@
 .seg button.active{color:var(--ink);}
 .seg .ic{margin-right:0;}
 
+/* --- Menü-Fenster (assets/menu.js): auf jeder Seite über dem Inhalt --- */
+.mn-ov{position:fixed;inset:0;z-index:9000;display:none;align-items:flex-start;justify-content:center;padding:max(12px,env(safe-area-inset-top)) 12px 12px;background:rgba(12,14,20,.36);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+.mn-ov.mn-show{display:flex;}
+.mn-box{width:100%;max-width:460px;max-height:calc(100dvh - 24px);overflow:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 18px;border-radius:22px;color:var(--ink);
+  background:var(--g-surf-strong,rgba(255,255,255,.9));border:1px solid var(--g-brd,rgba(255,255,255,.8));box-shadow:0 28px 70px rgba(10,12,20,.30), var(--g-hi,none);
+  -webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%);animation:mn-in .18s ease;}
+@keyframes mn-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.mn-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.mn-head h3{margin:0;font-size:1.15rem;font-family:var(--font-head,inherit);}
+.mn-x{width:36px;height:36px;border-radius:10px;border:1px solid var(--g-line,rgba(0,0,0,.1));background:var(--g-input,#fff);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+.mn-box .ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;}
+.mn-nav{display:flex;flex-direction:column;gap:8px;}
+.mn-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;text-decoration:none;color:var(--ink);font-family:inherit;font-size:.95rem;cursor:pointer;
+  padding:11px 12px;border-radius:14px;background:var(--g-input,#fff);border:1px solid var(--g-line,rgba(0,0,0,.1));}
+.mn-item > span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.mn-item b{font-weight:700;}
+.mn-item small{color:var(--muted);font-size:.74rem;}
+.mn-item > .ic:first-child{color:var(--g-tint-ink,var(--lely-red));}
+.mn-item > .ic:last-child{color:var(--muted);width:18px;height:18px;}
+.mn-item:active{filter:brightness(.96);}
+.mn-active{border-color:var(--g-tint-brd,rgba(200,16,46,.2));background:var(--g-tint,rgba(200,16,46,.08));}
+.mn-sec{margin-top:14px;padding:12px;border-radius:14px;background:var(--g-input,#fff);border:1px solid var(--g-line,rgba(0,0,0,.1));}
+.mn-sec h4{margin:0 0 6px;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.mn-sec p{margin:0 0 8px;font-size:.82rem;color:var(--g-ink-soft,var(--muted));line-height:1.35;}
+.mn-who{font-weight:700;margin-bottom:8px;}
+.mn-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 12px;border-radius:12px;cursor:pointer;text-decoration:none;font-family:inherit;font-weight:700;font-size:.88rem;color:var(--ink);
+  background:var(--g-surf-strong,#fff);border:1px solid var(--g-line,rgba(0,0,0,.12));box-shadow:var(--g-hi,none);}
+.mn-btn:active{filter:brightness(.95);}
+.mn-row{display:flex;gap:8px;margin-top:8px;}
+.mn-row .mn-btn{flex:1;font-size:.8rem;padding:9px 6px;}
+.mn-list{font-size:.8rem;line-height:1.5;color:var(--g-ink-soft,var(--muted));}
+.mn-muted{color:var(--muted);}
+.mn-msg{margin-top:8px;font-size:.8rem;font-weight:700;}
+.mn-msg.ok{color:var(--ok);} .mn-msg.err{color:var(--less);}
+.mn-link{display:block;margin:14px auto 0;background:none;border:0;color:var(--muted);font-family:inherit;font-size:.85rem;cursor:pointer;padding:6px 10px;}
+.mn-ol{margin:0;padding-left:20px;font-size:.85rem;line-height:1.5;}
+.mn-seg{display:flex;gap:4px;padding:4px;margin:2px 0;background:var(--g-surf-strong,#fff);border:1px solid var(--g-line,rgba(0,0,0,.1));border-radius:12px;}
+.mn-seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid transparent;background:none;padding:9px 6px;border-radius:9px;font-weight:700;font-size:.85rem;color:var(--muted);cursor:pointer;font-family:inherit;}
+.mn-seg button.active{color:var(--ink);background:var(--g-input,#fff);border-color:var(--g-brd);box-shadow:var(--g-hi), 0 1px 3px rgba(15,23,42,.12);}
+
 /* GLASS-END */
 </style>
 </head>
@@ -830,7 +870,7 @@
       <div class="topbar-title">Lely KDW</div>
       <div class="topbar-sub">Letzte Aktualisierung: 18.11.2026</div>
     </div>
-    <div class="topbar-actions"><a class="topbar-menu" id="link-menu" href="../" style="display:none"><svg class="ic ic-solo" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Menü</a><button type="button" class="topbar-settings" id="btn-settings" aria-label="Einstellungen"><svg class="ic ic-solo" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
+    <div class="topbar-actions"><a class="topbar-menu" id="link-menu" href="../"><svg class="ic ic-solo" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Menü</a></div>
   </div>
 </header>
 
@@ -1356,11 +1396,6 @@ document.getElementById('settings-name-select').addEventListener('change', (e) =
   updatePerson();
 });
 
-document.getElementById('btn-settings').addEventListener('click', () => {
-  if (IN_KDW_FOLDER){ location.href = '../?settings=1'; return; }   // neue Struktur: alle Einstellungen liegen im Menü
-  renderSettingsNameList();
-  settingsModal.classList.remove('hidden');
-});
 document.getElementById('btn-settings-close').addEventListener('click', () => {
   settingsModal.classList.add('hidden');
 });
@@ -1952,6 +1987,10 @@ function buildPrintTable(){
   html += '<tr><td colspan="2" class="pt-title">KDW Bestellformular Einbau</td><td colspan="2" class="pt-version">Stand: ' + stand + '</td><td class="pt-noborder"></td></tr>';
   html += '<tr><td class="pt-label pt-yellow">Einbauer</td><td class="pt-yellow">' + escapeHtml(p.name) + '</td><td class="pt-label">Lagerort</td><td>' + escapeHtml(p.lagerort) + '</td><td class="pt-noborder"></td></tr>';
   html += '<tr><td class="pt-label pt-yellow">Datum</td><td class="pt-yellow">' + escapeHtml(datumFmt) + '</td><td class="pt-label">Kostenstelle</td><td>' + escapeHtml(p.kostenstelle) + '</td><td class="pt-noborder"></td></tr>';
+  if (MODE === 'kunde'){   // Material für Kunden: Kundendaten gehören ins PDF
+    html += '<tr><td class="pt-label pt-yellow">Kunde</td><td class="pt-yellow">' + escapeHtml(KUNDE.name) + '</td><td class="pt-label">Kundennr.</td><td>' + escapeHtml(KUNDE.nr) + '</td><td class="pt-noborder"></td></tr>';
+    html += '<tr><td class="pt-label pt-yellow">PLZ / Ort</td><td class="pt-yellow">' + escapeHtml(KUNDE.ort) + '</td><td class="pt-label">Projektnr.</td><td>' + escapeHtml(KUNDE.projekt) + '</td><td class="pt-noborder"></td></tr>';
+  }
   html += '<tr><td colspan="5" class="pt-spacer"></td></tr>';
   html += '<tr class="pt-headers"><td>Artikelnummer</td><td>Artikelbezeichnung</td><td>Einheit</td><td>Bestellmenge</td><td>zusätzliche Infos</td></tr>';
 
@@ -1985,6 +2024,7 @@ document.getElementById('btn-print').addEventListener('click', ()=>{
     alert('Bitte zuerst den Einbauer auswählen.');
     return;
   }
+  if (MODE === 'kunde' && (!KUNDE.name || !KUNDE.ort)){ openKundeModal(); return; }
   const result = buildPrintTable();
   if (!result.any){
     alert('Bitte zuerst mindestens einen Artikel mit Menge eingeben.');
@@ -2242,7 +2282,6 @@ document.getElementById('btn-kunde-cancel').addEventListener('click', ()=>{
 });
 document.getElementById('btn-kunde-edit').addEventListener('click', openKundeModal);
 const IN_KDW_FOLDER = /\/kdw\/?(index\.html)?$/.test(location.pathname);   // neue Struktur: Menü liegt eine Ebene höher
-if (IN_KDW_FOLDER){ document.getElementById('link-menu').style.display = ''; document.getElementById('btn-settings').style.display = 'none'; }   // Einstellungen liegen im Menü
 if (!IN_KDW_FOLDER){   // alte Struktur (Seite liegt im Stammverzeichnis): kein Menü, nur die Bestellart-Frage
   document.getElementById('btn-switch-mode').innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Bestellart wechseln';
   document.getElementById('btn-switch-mode').closest('.settings-section').querySelector('.settings-label').textContent = 'Bestellart';
@@ -2360,5 +2399,7 @@ document.addEventListener('keydown', (e)=>{
 });
 </script>
 
+<script src="/assets/data.js"></script>
+<script src="/assets/menu.js"></script>
 </body>
 </html>

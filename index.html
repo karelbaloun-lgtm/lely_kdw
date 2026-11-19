@@ -349,14 +349,6 @@
   .sec p{margin:0 0 10px;font-size:.8rem;color:var(--muted);line-height:1.45;}
   .sec .btns{display:flex;gap:8px;flex-wrap:wrap;}
   .sec .btns button{flex:1 1 150px;}
-  .topbar-gear{flex:0 0 auto;width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-  .topbar-gear:active{background:rgba(255,255,255,.28);}
-  .set-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:250;display:flex;align-items:center;justify-content:center;padding:20px;}
-  .set-box{background:var(--card);color:var(--ink);border-radius:14px;max-width:420px;width:100%;padding:20px 20px 16px;box-shadow:0 8px 30px rgba(0,0,0,.3);max-height:calc(100vh - 40px);overflow-y:auto;}
-  .set-box h3.t{margin:0 0 4px;font-size:1.1rem;}
-  .set-box .sec{margin-top:14px;padding:12px 14px;border-radius:12px;}
-  .set-box .full{display:block;width:100%;text-align:center;text-decoration:none;box-sizing:border-box;}
-  .set-box .who{font-weight:700;margin-bottom:8px;}
   .set-close{margin-top:14px;width:100%;padding:9px;border:none;background:transparent;color:var(--muted);font-size:.85rem;cursor:pointer;text-decoration:underline;font-family:inherit;}
   /* --- Startseite: Begrüßung, Gruppen, große Kacheln (mobil zuerst) --- */
   .wrap{padding-bottom:calc(28px + env(safe-area-inset-bottom));}
@@ -394,8 +386,6 @@
   :root[data-theme="dark"] .chip-center{background:rgba(30,32,40,.55);border-color:rgba(255,255,255,.14);box-shadow:0 4px 14px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.10);}
   @media (prefers-color-scheme: dark){ :root[data-theme="auto"] .chip-center{background:rgba(30,32,40,.55);border-color:rgba(255,255,255,.14);box-shadow:0 4px 14px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.10);} }
   .chip-center svg{width:12px;height:12px;fill:none;stroke:var(--muted);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;}
-  .topbar-gear{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.35);}
-  .topbar-gear svg{width:19px;height:19px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
   .helpol{margin:6px 0 0;padding-left:20px;font-size:.88rem;line-height:1.5;color:var(--ink);}
   .helpol li{margin-bottom:6px;}
   #bk-list{font-size:.8rem;margin:0 0 10px;color:var(--ink);}
@@ -575,6 +565,46 @@
 .seg button.active{color:var(--ink);}
 .seg .ic{margin-right:0;}
 
+/* --- Menü-Fenster (assets/menu.js): auf jeder Seite über dem Inhalt --- */
+.mn-ov{position:fixed;inset:0;z-index:9000;display:none;align-items:flex-start;justify-content:center;padding:max(12px,env(safe-area-inset-top)) 12px 12px;background:rgba(12,14,20,.36);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+.mn-ov.mn-show{display:flex;}
+.mn-box{width:100%;max-width:460px;max-height:calc(100dvh - 24px);overflow:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 18px;border-radius:22px;color:var(--ink);
+  background:var(--g-surf-strong,rgba(255,255,255,.9));border:1px solid var(--g-brd,rgba(255,255,255,.8));box-shadow:0 28px 70px rgba(10,12,20,.30), var(--g-hi,none);
+  -webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%);animation:mn-in .18s ease;}
+@keyframes mn-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.mn-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.mn-head h3{margin:0;font-size:1.15rem;font-family:var(--font-head,inherit);}
+.mn-x{width:36px;height:36px;border-radius:10px;border:1px solid var(--g-line,rgba(0,0,0,.1));background:var(--g-input,#fff);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+.mn-box .ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;}
+.mn-nav{display:flex;flex-direction:column;gap:8px;}
+.mn-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;text-decoration:none;color:var(--ink);font-family:inherit;font-size:.95rem;cursor:pointer;
+  padding:11px 12px;border-radius:14px;background:var(--g-input,#fff);border:1px solid var(--g-line,rgba(0,0,0,.1));}
+.mn-item > span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.mn-item b{font-weight:700;}
+.mn-item small{color:var(--muted);font-size:.74rem;}
+.mn-item > .ic:first-child{color:var(--g-tint-ink,var(--lely-red));}
+.mn-item > .ic:last-child{color:var(--muted);width:18px;height:18px;}
+.mn-item:active{filter:brightness(.96);}
+.mn-active{border-color:var(--g-tint-brd,rgba(200,16,46,.2));background:var(--g-tint,rgba(200,16,46,.08));}
+.mn-sec{margin-top:14px;padding:12px;border-radius:14px;background:var(--g-input,#fff);border:1px solid var(--g-line,rgba(0,0,0,.1));}
+.mn-sec h4{margin:0 0 6px;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.mn-sec p{margin:0 0 8px;font-size:.82rem;color:var(--g-ink-soft,var(--muted));line-height:1.35;}
+.mn-who{font-weight:700;margin-bottom:8px;}
+.mn-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 12px;border-radius:12px;cursor:pointer;text-decoration:none;font-family:inherit;font-weight:700;font-size:.88rem;color:var(--ink);
+  background:var(--g-surf-strong,#fff);border:1px solid var(--g-line,rgba(0,0,0,.12));box-shadow:var(--g-hi,none);}
+.mn-btn:active{filter:brightness(.95);}
+.mn-row{display:flex;gap:8px;margin-top:8px;}
+.mn-row .mn-btn{flex:1;font-size:.8rem;padding:9px 6px;}
+.mn-list{font-size:.8rem;line-height:1.5;color:var(--g-ink-soft,var(--muted));}
+.mn-muted{color:var(--muted);}
+.mn-msg{margin-top:8px;font-size:.8rem;font-weight:700;}
+.mn-msg.ok{color:var(--ok);} .mn-msg.err{color:var(--less);}
+.mn-link{display:block;margin:14px auto 0;background:none;border:0;color:var(--muted);font-family:inherit;font-size:.85rem;cursor:pointer;padding:6px 10px;}
+.mn-ol{margin:0;padding-left:20px;font-size:.85rem;line-height:1.5;}
+.mn-seg{display:flex;gap:4px;padding:4px;margin:2px 0;background:var(--g-surf-strong,#fff);border:1px solid var(--g-line,rgba(0,0,0,.1));border-radius:12px;}
+.mn-seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid transparent;background:none;padding:9px 6px;border-radius:9px;font-weight:700;font-size:.85rem;color:var(--muted);cursor:pointer;font-family:inherit;}
+.mn-seg button.active{color:var(--ink);background:var(--g-input,#fff);border-color:var(--g-brd);box-shadow:var(--g-hi), 0 1px 3px rgba(15,23,42,.12);}
+
 </style>
 </head>
 <body>
@@ -602,7 +632,7 @@
       <div class="topbar-title">Lely KDW</div>
       <div class="topbar-sub">Bestellungen · Auto-Bestand</div>
     </div>
-    <div class="topbar-actions"><button type="button" class="topbar-gear" id="btn-gear" aria-label="Einstellungen"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
+    <div class="topbar-actions"><a class="topbar-menu" href="/"><svg class="ic ic-solo" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Menü</a></div>
   </div>
 </header>
 
@@ -623,78 +653,7 @@
     <a class="tile t-auto" href="auto/"><div class="tile-ico"><svg viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></div><div><div class="tile-title">Aus dem Auto abbuchen</div><div class="tile-sub">Entnahme für einen Kunden aus dem Auto-Bestand</div></div><span class="tile-go"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></span></a>
   </div>
 
-  <div class="foot2">Letzte Aktualisierung: 18.11.2026</div>
-</div>
-
-<div id="addhome-modal" class="set-ov hidden">
-  <div class="set-box">
-    <h3 class="t">Zum Startbildschirm hinzufügen</h3>
-    <div class="sec">
-      <h3>Android (Google Chrome)</h3>
-      <ol class="helpol">
-        <li>Oben rechts in Chrome auf <b>⋮</b> (drei Punkte) tippen.</li>
-        <li><b>„Installieren und Verknüpfung erstellen“</b> auswählen (heißt je nach Chrome-Version auch „Zum Startbildschirm hinzufügen“).</li>
-        <li><b>Hinzufügen</b> bestätigen.</li>
-      </ol>
-    </div>
-    <div class="sec">
-      <h3>iPhone (Safari)</h3>
-      <ol class="helpol">
-        <li>Unten oder oben auf das <b>Teilen-Symbol</b> tippen (Quadrat mit Pfeil nach oben, bei neueren Versionen unter <b>•••</b>).</li>
-        <li>Nach unten scrollen und <b>„Zum Home-Bildschirm“</b> antippen.</li>
-        <li><b>Hinzufügen</b> bestätigen.</li>
-      </ol>
-    </div>
-    <button type="button" class="set-close" id="btn-addhome-close">Schließen</button>
-  </div>
-</div>
-
-<div id="set-modal" class="set-ov hidden">
-  <div class="set-box">
-    <h3 class="t">Einstellungen</h3>
-    <div class="sec">
-      <h3>Center und Name</h3>
-      <div class="who" id="who"></div>
-      <button type="button" class="secondary full" id="btn-who">Center / Name ändern</button>
-    </div>
-    <div class="sec">
-      <h3>Design</h3>
-      <div class="seg" id="theme-seg">
-        <button type="button" data-theme-choice="light" aria-label="Hell"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Hell</button>
-        <button type="button" data-theme-choice="dark" aria-label="Dunkel"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Dunkel</button>
-        <button type="button" data-theme-choice="auto" aria-label="System"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></svg>System</button>
-      </div>
-    </div>
-    <div class="sec">
-      <h3>Schrift</h3>
-      <div class="seg" id="font-seg">
-        <button type="button" data-font-choice="lely">Lely</button>
-        <button type="button" data-font-choice="system">System</button>
-      </div>
-    </div>
-    <div class="sec">
-      <h3>Auf dem Startbildschirm</h3>
-      <p>Die App als Symbol auf dem Handy ablegen.</p>
-      <button type="button" class="secondary full" id="btn-addhome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Zum Startbildschirm hinzufügen</button>
-    </div>
-    <div class="sec">
-      <h3>Bestand zählen (in Arbeit)</h3>
-      <p>Bestandsliste vom Lager laden, zählen und als Auto-Bestand übernehmen. Wird noch weiterentwickelt.</p>
-      <a class="secondary full" href="bestand/" style="padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);color:var(--ink);font-weight:600;font-size:.85rem">Bestand zählen</a>
-    </div>
-    <div class="sec">
-      <h3>Auto-Bestand sichern</h3>
-      <p>Der Auto-Bestand liegt in deinem Telefon und wird – wenn eine Verbindung besteht – automatisch auf dem Server gespeichert. Zusätzlich kannst du ihn hier als Datei sichern und wiederherstellen.</p>
-      <div id="bk-list"></div>
-      <div class="btns">
-        <button type="button" class="secondary" id="bk-export">Sicherung speichern</button>
-        <button type="button" class="secondary" id="bk-import">Sicherung wiederherstellen</button>
-      </div>
-      <input type="file" id="bk-file" accept=".json,application/json" class="hidden">
-      <div id="bk-msg"></div>
-    </div>
-    <button type="button" class="set-close" id="btn-set-close">Schließen</button>
-  </div>
+  <div class="foot2">Letzte Aktualisierung: 19.11.2026</div>
 </div>
 
 <script>
@@ -1140,23 +1099,6 @@ const Stats = (() => {
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-async function paintBackupList(){
-  const el = $('bk-list'); if (!el) return; const parts = [];
-  for (const lo of Object.keys(PEOPLE)){
-    const d = await Autobestand.load(lo);          // gleicht dabei Telefon und Server ab
-    if (d) parts.push('<div><b>' + lo + '</b> · ' + esc(PEOPLE[lo][0]) + ' · ' + Object.keys(d.items).length + ' Artikel · Stand ' + stampDE(d.updated) + '</div>');
-  }
-  el.innerHTML = parts.length ? parts.join('') + '<div style="color:var(--muted);margin-top:4px">' + Autobestand.statusText() + '</div>' : '<div style="color:var(--muted)">Noch kein Auto-Bestand gespeichert.</div>';
-}
-const msg = (t, c) => { const m = $('bk-msg'); m.textContent = t; m.className = c || ''; };
-$('bk-export').addEventListener('click', () => { Stats.event('menu.backup_export'); downloadBlob(Autobestand.backupBlob(), 'Auto-Bestand_Sicherung_' + todayISO() + '.json'); msg('Sicherung gespeichert.', 'ok'); });
-$('bk-import').addEventListener('click', () => { $('bk-file').value = ''; $('bk-file').click(); });
-$('bk-file').addEventListener('change', async e => {
-  const f = e.target.files[0]; if (!f) return;
-  if (!confirm('Die Sicherung ersetzt den aktuellen Auto-Bestand der enthaltenen Lagerorte. Fortfahren?')) return;
-  try { const n = await Autobestand.restore(f); Stats.event('menu.backup_restore'); msg('Wiederhergestellt: ' + n + ' Lagerort(e).', 'ok'); paintBackupList(); }
-  catch(err){ msg(err.message || 'Die Datei konnte nicht gelesen werden.', 'err'); }
-});
 // ===== Begrüßung: wechselt je nach Tageszeit und Wochentag (rein lokal, ohne Netzwerk) =====
 const GREET_WORDS = {
   morning: ['Guten Morgen', 'Servus', 'Moin', 'Habe die Ehre', 'Griaß di'],
@@ -1183,41 +1125,16 @@ function renderGreeting(){
 function renderWho(withGreeting){
   const lo = savedLagerort();
   const centerName = lo ? ((CENTERS[PEOPLE[lo][2]] || NO_CENTER).short || PEOPLE[lo][2]) : '';
-  $('who').textContent = lo ? centerName + ' · ' + PEOPLE[lo][0] : 'Noch nicht gewählt';
   $('hello').classList.toggle('hidden', !lo);   // Begrüßung erst, wenn Center + Name gewählt sind
   if (lo){ $('hello-name').textContent = PEOPLE[lo][0].split(' ')[0]; $('chip-text').textContent = centerName; if (withGreeting) renderGreeting(); }
 }
-const setModal = $('set-modal');
-function paintDesign(){
-  let t = 'auto', f = 'lely'; try { t = localStorage.getItem('kdw_theme') || 'auto'; f = localStorage.getItem('kdw_font') === 'system' ? 'system' : 'lely'; } catch(e){}
-  document.querySelectorAll('#theme-seg button').forEach(b => b.classList.toggle('active', b.dataset.themeChoice === t));
-  document.querySelectorAll('#font-seg button').forEach(b => b.classList.toggle('active', b.dataset.fontChoice === f));
-}
-document.querySelectorAll('#theme-seg button').forEach(b => b.addEventListener('click', () => {
-  try { localStorage.setItem('kdw_theme', b.dataset.themeChoice); } catch(e){}
-  document.documentElement.setAttribute('data-theme', b.dataset.themeChoice); paintDesign();
-}));
-document.querySelectorAll('#font-seg button').forEach(b => b.addEventListener('click', () => {
-  try { localStorage.setItem('kdw_font', b.dataset.fontChoice); } catch(e){}
-  document.documentElement.setAttribute('data-font', b.dataset.fontChoice); paintDesign();
-}));
-const addhomeModal = $('addhome-modal');
-$('btn-addhome').addEventListener('click', () => { setModal.classList.add('hidden'); addhomeModal.classList.remove('hidden'); });
-$('btn-addhome-close').addEventListener('click', () => addhomeModal.classList.add('hidden'));
-addhomeModal.addEventListener('click', e => { if (e.target === addhomeModal) addhomeModal.classList.add('hidden'); });
-const openSettings = () => { renderWho(); paintDesign(); paintBackupList(); setModal.classList.remove('hidden'); };
-$('btn-gear').addEventListener('click', openSettings);
-$('btn-set-close').addEventListener('click', () => setModal.classList.add('hidden'));
-setModal.addEventListener('click', e => { if (e.target === setModal) setModal.classList.add('hidden'); });
-const changeWho = () => { setModal.classList.add('hidden'); welcomeEinbauer(() => renderWho(true)); };
-$('btn-who').addEventListener('click', changeWho);
-$('chip-center').addEventListener('click', changeWho);
+$('chip-center').addEventListener('click', () => KDWMenu.changeWho());
 Stats.pageview('menu');
 renderWho(true);
-// Die anderen Seiten verlinken ihr Zahnrad hierher (?settings=1) -> Einstellungen sofort öffnen
-if (new URLSearchParams(location.search).get('settings') === '1'){ openSettings(); try { history.replaceState(null, '', location.pathname); } catch(e){} }
 // Erster Besuch: zuerst "Welches Center?", dann der Name (gilt dann für alle Seiten)
 if (!savedLagerort()) welcomeEinbauer(() => renderWho(true));
 </script>
+<script src="/assets/data.js"></script>
+<script src="/assets/menu.js"></script>
 </body>
 </html>
